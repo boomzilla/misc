@@ -5,6 +5,8 @@
 #to generate 3-grams
 #
 #this is something I just threw together one evening, might have some errors, bugs, etc
+#
+#foo
 
 import sys
 import nltk.corpus.reader.cmudict
