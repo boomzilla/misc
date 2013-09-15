@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+#get site pages off of Google cache
+SITE="http://www.example.com/"
+wget $SITE
