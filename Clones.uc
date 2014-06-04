@@ -70,15 +70,15 @@ function AddPlayerInventory()
 {
 	local DeusExWeapon aWeapon;
 	local int i;
-	local Inventory item, nextItem;
-	local WeaponNanoSword DT;
+	local Inventory item, nextItem, thisItem;
+	//local WeaponNanoSword DT;
 	
-	DT = Spawn(Class'WeaponNanoSword');
-	DT.GiveTo(Self);
+	//DT = Spawn(Class'WeaponNanoSword');
+	//DT.GiveTo(Self);
 	
 	//AddInventory(class'WeaponNanoSword');
 	
-	/*if (DeusExPlayer(Owner).Inventory != None)
+	if (DeusExPlayer(Owner).Inventory != None)
 	{
 		do
 		{
@@ -88,12 +88,14 @@ function AddPlayerInventory()
 			//if ((DeusExWeapon(item) != None) && (DeusExWeapon(item).bNativeAttack))
 			//	item.Destroy();
 			//else
-			AddInventory(item);
+			//AddInventory(item);
+			thisItem = Spawn(item.class);
+			thisItem.GiveTo(Self);
 			log("adding inventory item: " $ item);
 			item = nextItem;
 		}
 		until (item == None);
-	}*/
+	}
 
 	/*
 	for (item=DeusExPlayer(Owner).Inventory; item!=None; item=DeusExPlayer(Owner).Inventory)
