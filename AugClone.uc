@@ -72,6 +72,9 @@ state Active
 			M1.LightSaturation = 140;
 			M1.LightBrightness = 192;
 		}
+		
+	M1.AddPlayerInventory();
+	M2.AddPlayerInventory();
 	}
 
 Begin:
@@ -81,8 +84,14 @@ function Deactivate()
 {
 	Super.Deactivate();
 
+	if(M1!=None)
+	{
+		M1.SpawnCarcass();
+	}
 	if(M2!=None)
-	M2.SpawnCarcass();
+	{
+		M2.SpawnCarcass();
+	}
 	//M2.Destroy();
 	//M2=None;
 }

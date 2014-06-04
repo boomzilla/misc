@@ -87,10 +87,10 @@ function AddPlayerInventory()
 			new(item.Class(item));
 			AddInventory2(item);
 		}
-		else if(!item.isA('DeusExWeapon'))
-		{
-			return;
-		}
+		//else if(!item.isA('DeusExWeapon'))
+		//{
+		//	return;
+		//}
 		*/
 			AddInventory2(item);
 	}
@@ -108,9 +108,9 @@ function bool AddInventory2( inventory NewItem )
 	if (NewItem ==None )
 		log("tried to add none inventory to "$self);
 
-	for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory )
-		if( Inv == NewItem )
-			return false;
+	//for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory )
+	//	if( Inv == NewItem )
+	//		return false;
 	for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory ) //Clones ONLY get the weapons. hmmph smh.
 		if (!inv.isA('DeusExWeapon'))
 			return false;
