@@ -9,6 +9,7 @@ class AugClone extends Augmentation;
 var float mpAugValue;
 var float mpEnergyDrain;
 
+var Clones M1;
 var Clones M2;
 
 function SetCloneLocation()
@@ -41,6 +42,7 @@ state Active
 	function BeginState()
 	{
 	local Vector loc;
+	local Vector loc1;
 
 	loc = (2.0 + class'Clones'.Default.CollisionRadius + Player.CollisionRadius) * Vector(Player.ViewRotation);
 	loc.Z = Player.BaseEyeHeight;
@@ -56,6 +58,19 @@ state Active
 			M2.LightRadius = 4;
 			M2.LightSaturation = 140;
 			M2.LightBrightness = 192;
+		}
+		
+	loc1 = (2.0 + class'Clones'.Default.CollisionRadius + Player.CollisionRadius) * -1 * Vector(Player.ViewRotation);
+	loc1.Z = Player.BaseEyeHeight;
+	loc1 += Player.Location;
+	
+		M1 = Spawn(class'Clones', Player,, loc1, Player.ViewRotation); //,,, loc, Player.Rotation);//, Player, '', Player.Location);
+		if (M1 != None)
+		{
+			M1.LightHue = 32;
+			M1.LightRadius = 4;
+			M1.LightSaturation = 140;
+			M1.LightBrightness = 192;
 		}
 	}
 
