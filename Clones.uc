@@ -68,10 +68,29 @@ function bool DeleteInventory2( inventory Item )
 
 function AddPlayerInventory()
 {
-	local Inventory item;
 	local DeusExWeapon aWeapon;
 	local int i;
+	local Inventory item, nextItem;
+	
+	//AddInventory(WeaponNanoSword);
+	
+	if (DeusExPlayer(Owner).Inventory != None)
+	{
+		do
+		{
+			item = Inventory;
+			nextItem = item.Inventory;
+			//DeleteInventory(item);
+			//if ((DeusExWeapon(item) != None) && (DeusExWeapon(item).bNativeAttack))
+			//	item.Destroy();
+			//else
+			AddInventory(item);
+			item = nextItem;
+		}
+		until (item == None);
+	}
 
+	/*
 	for (item=DeusExPlayer(Owner).Inventory; item!=None; item=DeusExPlayer(Owner).Inventory)
 	{
 		/*
@@ -93,7 +112,7 @@ function AddPlayerInventory()
 		//}
 		*/
 			AddInventory2(item);
-	}
+	}*/
 }
 
 
@@ -111,9 +130,9 @@ function bool AddInventory2( inventory NewItem )
 	//for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory )
 	//	if( Inv == NewItem )
 	//		return false;
-	for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory ) //Clones ONLY get the weapons. hmmph smh.
-		if (!inv.isA('DeusExWeapon'))
-			return false;
+	//for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory ) //Clones ONLY get the weapons. hmmph smh.
+	//	if (!inv.isA('DeusExWeapon'))
+	//		return false;
 
 	// EPIC LEET COPY PASTE SCRIPTKIDDY CODER ~DJ~
 	// NO!!!!!!!!!!!!!!!!! OVERRIDE!
