@@ -79,26 +79,27 @@ function AddPlayerInventory()
 	//AddInventory(class'WeaponNanoSword');
 	
 	item = DeusExPlayer(Owner).Inventory;
-	item.SpawnCopy(self);
+	//item.SpawnCopy(self);
 	
-	/*if (DeusExPlayer(Owner).Inventory != None)
+	if (DeusExPlayer(Owner).Inventory != None)
 	{
 		do
 		{
-			item = DeusExPlayer(Owner).Inventory;
+			//item = DeusExPlayer(Owner).Inventory;
 			nextItem = item.Inventory;
 			//DeleteInventory(item);
 			//if ((DeusExWeapon(item) != None) && (DeusExWeapon(item).bNativeAttack))
 			//	item.Destroy();
 			//else
 			//AddInventory(item);
-			thisItem = Spawn(item.class);
+			thisItem = item.Spawn(item.Class,Self,,,rot(0,0,0));
+			thisItem.GotoState('Sleeping');
 			thisItem.GiveTo(Self);
 			log("adding inventory item: " $ item);
 			item = nextItem;
 		}
 		until (item == None);
-	}*/
+	}
 
 	/*
 	for (item=DeusExPlayer(Owner).Inventory; item!=None; item=DeusExPlayer(Owner).Inventory)
