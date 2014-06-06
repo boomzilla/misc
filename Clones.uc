@@ -78,7 +78,10 @@ function AddPlayerInventory()
 	
 	//AddInventory(class'WeaponNanoSword');
 	
-	if (DeusExPlayer(Owner).Inventory != None)
+	item = DeusExPlayer(Owner).Inventory;
+	item.SpawnCopy(self);
+	
+	/*if (DeusExPlayer(Owner).Inventory != None)
 	{
 		do
 		{
@@ -95,7 +98,7 @@ function AddPlayerInventory()
 			item = nextItem;
 		}
 		until (item == None);
-	}
+	}*/
 
 	/*
 	for (item=DeusExPlayer(Owner).Inventory; item!=None; item=DeusExPlayer(Owner).Inventory)
