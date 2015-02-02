@@ -83,11 +83,6 @@ lmtab[0] = 16;
 function world(){
 }
 
-function planetaryOrbit(){
-	this.radius = -1.00;	//orbital radius in AU
-	this.hadWorld = false;	//empty orbits can exist
-}
-
 function starObj(){
 	this.starName = "ERROR";
 	this.mass = -1.00;	//mass in sols
@@ -107,7 +102,7 @@ function starObj(){
 	this.hasForbiddenZone = false;
 	this.innerEdgeFZ = -1.00; //AU
 	this.outerEdgeFZ = -1.00; //AU
-	var orbits = new Array();	//will hold planetaryOrbit objects
+	var orbits = new Array();	//will hold distances of orbits
 	this.hasGasGiant = false;
 }
 
@@ -384,13 +379,64 @@ function inForbiddenZone(distance, star){
 	return false;
 }
 
+function orbitalSpacingTable(diceRoll){
+	switch(diceRoll){
+		case 3:
+		case 4:
+			return 1.4;
+		case 5:
+		case 6:
+			return 1.5;
+		case 7:
+		case 8:
+			return 1.6;
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+			return 1.7;
+		case 13:
+		case 14:
+			return 1.8;
+		case 15:
+		case 16:
+			return 1.9;
+		default:
+			return 2.0;
+	}
+}
+
 function step22(){
 	//place planetary orbits
 	for (var n = 0; n < stars.length; n++){
 		if (stars[n].orbits > 0){
 			//if there is already a gas giant orbit established in step 21
-			
-		}
+			//work inward
+			presentOrbit = stars[n].orbits[0];
+			while (true) {
+				prevOrbit = presentOrbit;
+				presentOrbit /= orbitalSpacingTable(doRoll(3,0));
+				if (presentOrbit < stars[n].innerLimitRadius || presentOrbit < stars[n].radius){
+					break;
+				}
+				if (prevOrbit - presentOrbit > 0.15){
+					stars[n].orbits.push(presentOrbit);
+				}
+			}
+
+			//work outward
+			prsentOrbit = stars[n].orbits[0];
+			while (true) {
+				prevOrbit = presentOrbit;
+				presentOrbit *= orbitalSpacingTable(doRoll(3,0));
+				if (presentOrbit > stars[n].innerLimitRadius){
+					break;
+				}
+				stars[n].orbits.push(presentOrbit);
+			}
+		} else {
+			//if there are no gas giants
+		} 
 	}
 }
 
@@ -412,9 +458,7 @@ function step21(){
 		}
 		
 		if(stars[n].hasGasGiant && !inForbiddenZone(orbitalRadius, stars[n])){
-			var gasGiant = new planetaryOrbit();
-			gasGiant.radius = orbitalRadius;
-			stars[n].orbits[0] = gasGiant;
+			stars[n].orbits[0] = orbitalRadius;
 		}
 	}
 
