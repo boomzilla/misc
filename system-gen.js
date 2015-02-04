@@ -1399,7 +1399,7 @@ for (var n=0;n<stars.length;n++){
 	document.write("&lt;div class=\"SystemTableCat TableAltRow Table2L\"&gt;Mass&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer TableAltRow Table2L\"&gt; " + stars[n].mass + " x sol &lt;/div&gt;<br/>");
 	document.write("&lt;div class=\"SystemTableCat\"&gt;Temperature&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer\"&gt;" + stars[n].temp + "K &lt;/div&gt;<br/>");
 	document.write("&lt;div class=\"SystemTableCat TableAltRow\"&gt;Luminosity&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer TableAltRow\"&gt;" + stars[n].lumin + " x Sol &lt;/div&gt;<br/>");
-	document.write("&lt;div class=\"SystemTableCat\"&gt;# of Planets&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer\"&gt;" + stars[n].planetCount + &lt;/div&gt;<br/>");
+	document.write("&lt;div class=\"SystemTableCat\"&gt;# of Planets&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer\"&gt;" + stars[n].planetCount + "&lt;/div&gt;<br/>");
 	document.write("&lt;div class=\"SystemTableCat TableAltRow\"&gt;Jumpgate&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer TableAltRow\"&gt;???&lt;/div&gt;<br/>");
 	if (n > 0){
 		document.write("&lt;div class=\"SystemTableCat TableAltRow\"&gt;Orbital Radius&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer TableAltRow\"&gt;" + stars[n].avgOrbitalRad + " AU &lt;/div&gt;<br/>");
