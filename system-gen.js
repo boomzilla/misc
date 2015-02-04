@@ -106,10 +106,10 @@ function starObj(){
 	this.hasForbiddenZone = false;
 	this.innerEdgeFZ = -1.00; //AU
 	this.outerEdgeFZ = -1.00; //AU
-	var orbits = new Array();	//will hold distances of orbits
+	this.orbits = new Array();	//will hold distances of orbits
 	this.hasGasGiant = false;
 	this.gasGiantArrangement = "none";
-	var worlds = new Array();	//will hold world objects taht orbit it
+	this.worlds = new Array();	//will hold world objects taht orbit it
 	this.planetCount = 0;	//count of planets (non-asteroids)
 }
 
@@ -384,7 +384,7 @@ function tempToType(temp){
 }
 
 function inForbiddenZone(distance, star){
-	if (distace < star.radius){
+	if (distance < star.radius){
 		return true;
 	}
 	if (star.hasForbiddenZone && (distance > star.innerEdgeFZ && distance < star.outerEdgeFZ)){
@@ -421,6 +421,7 @@ function orbitalSpacingTable(diceRoll){
 }
 
 function step23(){
+	document.write("STEP 23");
 	//PLACE WORLDS
 	//just assume one star for now
 	if (stars[0].hasGasGiant){
@@ -430,11 +431,12 @@ function step23(){
 		stars[0].planetCount++;
 
 
-					stars[n].gasGiantArrangement == "conventional";
+					stars[0].gasGiantArrangement == "conventional";
 	}
 }
 
 function step22(){
+	document.write("STEP 22");
 	//place planetary orbits
 	for (var n = 0; n < stars.length; n++){
 		if (stars[n].orbits > 0){
@@ -482,6 +484,7 @@ function step22(){
 }
 
 function step21(){
+	document.write("STEP 21");
 	//placing first planets
 	for (var n = 0; n < stars.length; n++){
 		gasGiantArrangement = doRoll(3, 0);
@@ -490,15 +493,15 @@ function step21(){
 		if (gasGiantArrangement == 11 || gasGiantArrangement == 12){
 			stars[n].hasGasGiant = true;
 			stars[n].gasGiantArrangement = "conventional";
-			orbitalRadius = ((doTwoDiceWithMinus(2) * 0.05) + 1) * stars[n].snowLine;
+			orbitalRadius = ((doRoll(2,-2) * 0.05) + 1) * stars[n].snowLine;
 		} else if (gasGiantArrangement == 13 || gasGiantArrangement == 14){
 			stars[n].hasGasGiant = true;
 			stars[n].gasGiantArrangement = "eccentric";
-			orbitalRadius = doOneDie() * 0.125 * stars[n].snowLine;
-		} else if (gasGiantArranement > 14){
+			orbitalRadius = doRoll(1, 0) * 0.125 * stars[n].snowLine;
+		} else if (gasGiantArrangement > 14){
 			stars[n].hasGasGiant = true;
 			stars[n].gasGiantArrangement = "epistellar";
-			orbitalRadius = doRoll() * 0.1 * stars[n].innerLimitRadius;
+			orbitalRadius = doRoll(3,0) * 0.1 * stars[n].innerLimitRadius;
 		}
 		
 		if(stars[n].hasGasGiant && !inForbiddenZone(orbitalRadius, stars[n])){
@@ -510,6 +513,7 @@ function step21(){
 }
 
 function step20(){
+	document.write("STEP 20");
 	//locate orbital zones
 	for (var n = 0; n < stars.length; n++){
 		//determine inner limit radius
@@ -546,6 +550,7 @@ function step20(){
 }
 
 function step19(){
+	document.write("STEP 19");
 	//companion star orbits
 	for (var n = 1; n < stars.length; n++){
 		//only iterate thru companion stras, duh
@@ -640,6 +645,8 @@ function step19(){
 		stars[n].perigee = (1 - stars[n].eccentricity) * stars[n].avgOrbitalRad;
 		stars[n].apogee = (1 + stars[n].eccentricity) * stars[n].avgOrbitalRad;
 	}
+
+	step20();
 }
 
 function step18(){
