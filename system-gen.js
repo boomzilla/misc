@@ -4,7 +4,7 @@ sysAge = -1.0; //billions of years
 document.write("<h1>" + sysName + " System</h1>");
 var rollSeq = "";
 readFrom = false;
-forceSingleStar = true;
+forceSingleStar = true;	//just have single star systems for now
 var stellarMassTable = new Array();
 stellarMassTable[0] = 2.00;
 stellarMassTable[1] = 1.90;
@@ -80,7 +80,11 @@ lmtab[0] = 16;
 
 //objects
 
-function world(){
+function world(orbitalRadius){
+	this.orbitalRadius = orbitalRadius;	//AU
+	this.worldType = "ERROR";	//gas giant, terrestrial, asteroid belt, etc
+	//this.position = -1; //position, including asteroid belts, excluding empty orbs
+	this.size = "ERROR"; 	//abstract size (large, medium, small, tiny)
 }
 
 function starObj(){
@@ -104,6 +108,9 @@ function starObj(){
 	this.outerEdgeFZ = -1.00; //AU
 	var orbits = new Array();	//will hold distances of orbits
 	this.hasGasGiant = false;
+	this.gasGiantArrangement = "none";
+	var worlds = new Array();	//will hold world objects taht orbit it
+	this.planetCount = 0;	//count of planets (non-asteroids)
 }
 
 //functions
@@ -125,7 +132,7 @@ function generateName(){
 	names[11]="Washington";
 	names[12]="Lincoln";
 	names[13]="Churchill";
-	names[14]="Tukayid";
+	names[14]="Tukayyid";
 	names[15]="Marley";
 	names[16]="Avalon";
 	names[17]="Heaven";
@@ -278,6 +285,13 @@ function generateName(){
 	names[162]="Gollean";
 	names[163]="Roada";
 	names[164]="Wist";
+	names[165]="Galileo";
+	names[166]="Lao Tzu";
+	names[167]="O'Neill";
+	names[168]="Clarke";
+	names[169]="Goddard";
+	names[170]="Oberth";
+	names[171]="Tsiolkovsky";
 
 	namesSize = names.length;
 	toReturn=names[Math.floor((Math.random()*namesSize))];
@@ -406,6 +420,20 @@ function orbitalSpacingTable(diceRoll){
 	}
 }
 
+function step23(){
+	//PLACE WORLDS
+	//just assume one star for now
+	if (stars[0].hasGasGiant){
+		var firstGasGiant = new world(stars[0].orbits.reverse().pop());
+		firstGasGiant.worldType = "gas giant";
+		stars[0].worlds.push(firstGasGiant);
+		stars[0].planetCount++;
+
+
+					stars[n].gasGiantArrangement == "conventional";
+	}
+}
+
 function step22(){
 	//place planetary orbits
 	for (var n = 0; n < stars.length; n++){
@@ -436,8 +464,21 @@ function step22(){
 			}
 		} else {
 			//if there are no gas giants
+			//work inward from outerLimitRadius
+			presentOrbit = stars[n].outerLimitRadius / (1 + doRoll(1,0)*0.05);
+			while (true) {
+				prevOrbit = presentOrbit;
+				presentOrbit /= orbitalSpacingTable(doRoll(3,0));
+				if (presentOrbit < stars[n].innerLimitRadius || presentOrbit < stars[n].radius){
+					break;
+				}
+				if (prevOrbit - presentOrbit > 0.15){
+					stars[n].orbits.push(presentOrbit);
+				}
+			}
 		} 
 	}
+	step23();
 }
 
 function step21(){
@@ -448,12 +489,15 @@ function step21(){
 
 		if (gasGiantArrangement == 11 || gasGiantArrangement == 12){
 			stars[n].hasGasGiant = true;
+			stars[n].gasGiantArrangement = "conventional";
 			orbitalRadius = ((doTwoDiceWithMinus(2) * 0.05) + 1) * stars[n].snowLine;
 		} else if (gasGiantArrangement == 13 || gasGiantArrangement == 14){
 			stars[n].hasGasGiant = true;
+			stars[n].gasGiantArrangement = "eccentric";
 			orbitalRadius = doOneDie() * 0.125 * stars[n].snowLine;
 		} else if (gasGiantArranement > 14){
 			stars[n].hasGasGiant = true;
+			stars[n].gasGiantArrangement = "epistellar";
 			orbitalRadius = doRoll() * 0.1 * stars[n].innerLimitRadius;
 		}
 		
@@ -1313,9 +1357,11 @@ document.write("<h2><a name=\"#systemOverviewText\">System Overview (plaintext):
 document.write("<br/>");
 document.write("<code>");
 
-document.write(sysAge + " billion Terran year old solar system<br/>");
+document.write(sysAge + " billion Terran-year-old solar system<br/>");
 document.write("<br/>");
 
+
+//output plaintext
 for (var n=0;n<stars.length;n++){
 	document.write("Star Name: " + stars[n].starName + "<br/>");
 	document.write("Star Type: " + stars[n].spectype + " " + stars[n].starType + "<br/>");
@@ -1324,8 +1370,7 @@ for (var n=0;n<stars.length;n++){
 	document.write("Mass: " + stars[n].mass + " sols <br/>");
 	document.write("Temperature: " + stars[n].temp + "K<br/>");
 	document.write("Luminosity: " + stars[n].lumin + " sols<br/>");
-	//<div class="SystemTableCat"># of Planets</div><div class="SystemTableEntry SystemBuffer">2</div>
-	//<div class="SystemTableCat TableAltRow">Jumpgate</div><div class="SystemTableEntry SystemBuffer TableAltRow">No</div>
+	document.write("# of Planets: " + stars[n].planetCount + "<br/>");
 	if (n > 0){
 		document.write("Orbital Radius: " + stars[n].avgOrbitalRad + " AU<br/>");
 		document.write("Orbital Eccentricity: " + stars[n].eccentricity + "<br/>");
@@ -1336,6 +1381,8 @@ for (var n=0;n<stars.length;n++){
 	document.write("<br/>");
 }
 
+
+//output markup
 document.write("</code>");
 
 document.write("<h2><a name=\"#systemOverview\">System Overview (markup):</a></h2>");
@@ -1352,7 +1399,7 @@ for (var n=0;n<stars.length;n++){
 	document.write("&lt;div class=\"SystemTableCat TableAltRow Table2L\"&gt;Mass&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer TableAltRow Table2L\"&gt; " + stars[n].mass + " x sol &lt;/div&gt;<br/>");
 	document.write("&lt;div class=\"SystemTableCat\"&gt;Temperature&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer\"&gt;" + stars[n].temp + "K &lt;/div&gt;<br/>");
 	document.write("&lt;div class=\"SystemTableCat TableAltRow\"&gt;Luminosity&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer TableAltRow\"&gt;" + stars[n].lumin + " x Sol &lt;/div&gt;<br/>");
-	//<div class="SystemTableCat"># of Planets</div><div class="SystemTableEntry SystemBuffer">2</div>
+	document.write("&lt;div class=\"SystemTableCat\"&gt;# of Planets&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer\"&gt;" + stars[n].planetCount + &lt;/div&gt;<br/>");
 	document.write("&lt;div class=\"SystemTableCat TableAltRow\"&gt;Jumpgate&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer TableAltRow\"&gt;???&lt;/div&gt;<br/>");
 	if (n > 0){
 		document.write("&lt;div class=\"SystemTableCat TableAltRow\"&gt;Orbital Radius&lt;/div&gt;&lt;div class=\"SystemTableEntry SystemBuffer TableAltRow\"&gt;" + stars[n].avgOrbitalRad + " AU &lt;/div&gt;<br/>");
