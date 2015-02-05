@@ -430,6 +430,30 @@ function gasGiantSizeTable(roll){
 	}
 }
 
+function sortWorlds(){
+	//sort the worlds by orbital radius
+	//herp, just use insertion sort (not a big data set, so it's fine)
+	for (var m = 1; m <= (stars[0].worlds.length - 1); m++){
+		n = m;
+		while (n > 0 && stars[0].worlds[n-1].orbitalRadius > stars[0].worlds[n].orbitalRadius){
+			//swap [n] and [n-1]
+			//tempWorldA = stars[0].worlds[n-1];
+			//tempWorldB = stars[0].worlds[n];
+			var tempWorldA = new world(stars[0].worlds[n-1].orbitalRadius);
+			tempWorldA.worldType = stars[0].worlds[n-1].worldType;
+			tempWorldA.size = stars[0].worlds[n-1].size;
+
+			var tempWorldB = new world(stars[0].worlds[n].orbitalRadius);
+			tempWorldB.worldType = stars[0].worlds[n].worldType;
+			tempWorldB.size = stars[0].worlds[n].size;
+
+			stars[0].worlds[n-1] = tempWorldB;
+			stars[0].worlds[n] = tempWorldA;
+			n = n - 1;
+		}
+	}
+}
+
 function step23(){
 	//document.write("STEP 23");
 	//PLACE WORLDS
@@ -586,6 +610,7 @@ function step23(){
 		} //else, it's an empty orbit
 	}
 
+	sortWorlds();
 	//step24();
 }
 
@@ -1522,7 +1547,7 @@ document.write(sysAge + " billion Terran-year-old solar system<br/>");
 document.write("<br/>");
 
 
-//output plaintext
+//output plaintext system overview
 for (var n=0;n<stars.length;n++){
 	document.write("Star Name: " + stars[n].starName + "<br/>");
 	document.write("Star Type: " + stars[n].spectype + " " + stars[n].starType + "<br/>");
@@ -1540,8 +1565,14 @@ for (var n=0;n<stars.length;n++){
 	}
 	document.write("<br/>");
 	document.write("<br/>");
+	for (var planetInd = 0; planetInd<stars[n].worlds.length; planetInd++){
+		document.write("Planet: " + stars[n].starName + " " + planetInd + "<br/>");
+		document.write("Type: " + stars[n].worlds[planetInd].worldType + "<br/>");
+		document.write("Orbital Radius: " + stars[n].worlds[planetInd].orbitalRadius + "(AU) <br/>");
+		document.write("<br/>");
+		document.write("<br/>");
+	}
 }
-
 
 //output markup
 document.write("</code>");
