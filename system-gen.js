@@ -518,6 +518,19 @@ function step26(){
 		if (stars[0].worlds[n].worldType == "terrestrial"){
 			if (!noAtmo(stars[0].worlds[n])){
 				stars[0].worlds[n].atmoMass = doRoll(3,0)/10.0;
+				if (stars[0].worlds[n].size == "small" && stars[0].worlds[n].subType == "ice"){
+					if (doRoll(3,0)<16){
+						stars[0].worlds[n].suffocatingAtmo = true;
+						stars[0].worlds[n].mToxicAtmo = true;
+					} else {
+						stars[0].worlds[n].suffocatingAtmo = true;
+						stars[0].worlds[n].hToxicAtmo = true;
+					}
+				} else if (stars[0].worlds[n].size == "standard" && stars[0].worlds[n].subType == "ammonia"){
+					stars[0].worlds[n].suffocatingAtmo = true;
+					stars[0].worlds[n].lToxicAtmo = true;
+					stars[0].worlds[n].corrosiveAtmo = true;
+				}
 			}
 		}
 
@@ -525,6 +538,19 @@ function step26(){
 		for (moonInd = 0; moonInd < stars[0].worlds[n].moonSystem.length; moonInd++){
 			if (!noAtmo(stars[0].worlds[n].moonSystem[moonInd])){
 				stars[0].worlds[n].moonSystem[moonInd].atmoMass = doRoll(3,0)/10.0;
+				if (stars[0].worlds[n].moonSystem[moonInd].size == "small" && stars[0].worlds[n].moonSystem[moonInd].subType == "ice"){
+					if (doRoll(3,0)<16){
+						stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
+						stars[0].worlds[n].moonSystem[moonInd].mToxicAtmo = true;
+					} else {
+						stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
+						stars[0].worlds[n].moonSystem[moonInd].hToxicAtmo = true;
+					}
+				} else if (stars[0].worlds[n].moonSystem[moonInd].size == "standard" && stars[0].worlds[n].moonSystem[moonInd].subType == "ammonia"){
+					stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
+					stars[0].worlds[n].moonSystem[moonInd].lToxicAtmo = true;
+					stars[0].worlds[n].moonSystem[moonInd].corrosiveAtmo = true;
+				}
 			}
 		}
 	}
@@ -964,7 +990,7 @@ function step22(){
 	//document.write("STEP 22");
 	//place planetary orbits
 	for (var n = 0; n < stars.length; n++){
-		if (stars[n].orbits > 0){
+		if (stars[n].orbits.length > 0){
 			//if there is already a gas giant orbit established in step 21
 			//work inward
 			presentOrbit = stars[n].orbits[0];
@@ -987,7 +1013,9 @@ function step22(){
 				if (presentOrbit > stars[n].outerLimitRadius){
 					break;
 				}
-				stars[n].orbits.push(presentOrbit);
+				if (presentOrbit - prevOrbit > 0.15){
+					stars[n].orbits.push(presentOrbit);
+				}
 			}
 		} else {
 			//if there are no gas giants
