@@ -517,6 +517,42 @@ function step23(){
 	//okay, now iterate through set of potential terrestrials, empties, asteroids
 	for (var n = 0; n < terrestrials.length; n++){
 		modifier = 0;
+
+		presentRad = terrestrials[n];
+		presentOrb = stars[0].orbits.indexOf(presentRad);
+
+		if (presentOrb == 0){
+			modifier -= 3;
+		}
+
+		if (presentOrb == stars[0].orbits.length){
+			modifier -= 3;
+		}
+
+		if (presentOrb != stars[0].orbits.length){
+			nextRad = stars[0].orbits[presentOrb + 1];
+			for (var worldInd = 0; worldInd < stars[0].worlds; worldInd++){
+				if (stars[0].worlds[worldInd].orbitalRadius == nextRad){
+					if (stars[0].worlds[worldInd].worldType == "gas giant"){
+						modifier -= 6;
+					}					
+					break;
+				}
+			}
+		}
+
+		if (presentOrb != 0){
+			prevRad = stars[0].orbits[presentOrb - 1];
+			for (var worldInd = 0; worldInd < stars[0].worlds; worldInd++){
+				if (stars[0].worlds[worldInd].orbitalRadius == prevRad){
+					if (stars[0].worlds[worldInd].worldType == "gas giant"){
+						modifier -= 3;
+					}					
+					break;
+				}
+			}
+		}
+
 		orbitContent = doRoll(3,modifier);
 		if (orbitContent > 15){
 			var aPlanet = new world(terrestrials[n]);
@@ -549,6 +585,8 @@ function step23(){
 			stars[0].worlds.push(belt);
 		} //else, it's an empty orbit
 	}
+
+	//step24();
 }
 
 function step22(){
