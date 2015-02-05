@@ -1,3 +1,11 @@
+var forceGarden = false;
+
+do{
+	forceGarden = makeSolarSystem();
+} while (forceGarden);
+
+function makeSolarSystem(){
+var hasGarden = false;
 var stars=new Array();
 sysName = generateName();
 sysAge = -1.0; //billions of years
@@ -80,11 +88,28 @@ lmtab[0] = 16;
 
 //objects
 
+function moon(){
+	//major moons
+	this.orbitalRadius = -1.00;	//AU
+	this.worldType = "moon";
+	this.subType = "ERROR";	//for terrestrial wrolds: garden, chthonian, greenhouse, ice, etc
+	this.size = "ERROR"; 	//abstract size (large, medium, small, tiny)
+	this.worldName = "ERROR";
+	this.features = "";
+}
+
 function world(orbitalRadius){
 	this.orbitalRadius = orbitalRadius;	//AU
 	this.worldType = "ERROR";	//gas giant, terrestrial, asteroid belt, etc
+	this.subType = "ERROR";	//for terrestrial wrolds: garden, chthonian, greenhouse, ice, etc
 	//this.position = -1; //position, including asteroid belts, excluding empty orbs
 	this.size = "ERROR"; 	//abstract size (large, medium, small, tiny)
+	this.worldName = "ERROR";
+	this.features = "";
+	this.resonantMoons = 0;	//count of resonant moon
+	this.majorMoons = 0;	//count of major moons
+	this.capturedMoons = 0;	//count of captured asteroid moons
+	this.moonSystem = new Array(); //will hold moon objects for major moons
 }
 
 function starObj(){
@@ -111,6 +136,7 @@ function starObj(){
 	this.gasGiantArrangement = "none";
 	this.worlds = new Array();	//will hold world objects taht orbit it
 	this.planetCount = 0;	//count of planets (non-asteroids)
+	//this.hasGarden = false;
 }
 
 //functions
@@ -454,6 +480,133 @@ function sortWorlds(){
 	}
 }
 
+function step25(){
+	//world types
+}
+
+function step24(){
+	//place moons
+	for (n = 0; n < stars[0].worlds.length; n++){
+		if (stars[0].worlds[n].worldType == "gas giant")
+		{
+			resonantModifier = 0;
+			if (stars[0].worlds[n].orbitalRadius < 0.1){
+				resonantModifier = -10;
+			} else if (stars[0].worlds[n].orbitalRadius < 0.5){
+				resonantModifier = -8;
+			} else if (stars[0].worlds[n].orbitalRadius < 0.75){
+				resonantModifier = -6;
+			} else if (stars[0].worlds[n].orbitalRadius < 1.5){
+				resonantModifier = -3;
+			}
+
+			resMoon = doRoll(2,resonantModifier);
+			if (resMoon > 0){
+				stars[0].worlds[n].resonantMoons = resMoon;
+				if (resMoon > 9){
+					stars[0].world[n].features += "* spectacular ring system<br/>"
+				}
+			}
+			
+			majorModifier = 0;
+			if (stars[0].worlds[n].orbitalRadius < 0.1){
+				majorModifier = -6;
+			} else if (stars[0].worlds[n].orbitalRadius < 0.5){
+				majorModifier = -5;
+			} else if (stars[0].worlds[n].orbitalRadius < 0.75){
+				majorModifier = -4;
+			} else if (stars[0].worlds[n].orbitalRadius < 1.5){
+				majorModifier = -1;
+			}
+
+			majMoon = doRoll(1,majorModifier);
+			if (majMoon > 0){
+				stars[0].worlds[n].majorMoons = majMoon;
+				for (moonCount = 0; moonCount < majMoon; moonCount++){
+					moonSize = doRoll(3,0);
+					thisMoon = new moon;
+					if (moonSize < 12){
+						thisMoon.size = "tiny";
+					} else if (moonSize < 15){
+						thisMoon.size = "small";
+					} else {
+						thisMoon.size = "standard";
+					}
+					stars[0].worlds[n].moonSystem.push(thisMoon);
+				}
+			}
+
+			capturedModifier = 0;
+			if (stars[0].worlds[n].orbitalRadius < 0.5){
+				capturedModifier = -6;
+			} else if (stars[0].worlds[n].orbitalRadius < 0.75){
+				capturedModifier = -5;
+			} else if (stars[0].worlds[n].orbitalRadius < 1.5){
+				capturedModifier = -4;
+			} else if (stars[0].worlds[n].orbitalRadius < 3.0){
+				capturedModifier = -1;
+			}
+			capMoon = doRoll(1,capturedModifier);
+			if (capMoon > 0){
+				stars[0].worlds[n].capturedMoons = capMoon;
+			}
+		} else if (stars[0].worlds[n].worldType == "terrestrial"){
+			moonMod = 0;
+
+			if (stars[0].worlds[n].orbitalRadius < 0.5){
+				moonMod = -10;
+			} else if (stars[0].worlds[n].orbitalRadius < 0.75){
+				moonMod = -3;
+			} else if (stars[0].worlds[n].orbitalRadius < 1.5){
+				moonMod = -1;
+			}
+		
+			if (stars[0].worlds[n].size == "tiny"){
+				moonMod -= 2;
+			} else if (stars[0].worlds[n].size == "small"){
+				moonMod -= 1;
+			} else if (stars[0].worlds[n].size == "large"){
+				moonMod += 1;
+			}
+
+			majorMoon = doRoll(1, (-4+moonMod));
+
+			if (majorMoon > 0){
+				stars[0].worlds[n].majorMoons = majorMoon;
+				for (moonCount = 0; moonCount < majorMoon; moonCount++){
+					moonSize = doRoll(3,0);
+					thisMoon = new moon;
+					if (moonSize < 12){
+						thisMoon.size = "tiny";
+					} else if (moonSize < 15){
+						if (stars[0].worlds[n].size = "large"){
+							thisMoon.size = "small";
+						} else {
+							thisMoon.size = "tiny";
+						}
+					} else {
+						if (stars[0].worlds[n].size = "large"){
+							thisMoon.size = "standard";
+						} else if (stars[0].worlds[n].size = "standard"){
+							thisMoon.size = "small";
+						} else {
+							thisMoon.size = "tiny";
+						}
+					}
+					stars[0].worlds[n].moonSystem.push(thisMoon);
+				}
+			} else {
+				//it has no major moons, but possible captured moonlets
+				moonlet = doRoll(1, (-2+moonMod));
+				if (moonlet > 0){
+					stars[0].worlds[n].capturedMoons = moonlet;
+				}
+			}
+		}
+	}
+	step25();
+}
+
 function step23(){
 	//document.write("STEP 23");
 	//PLACE WORLDS
@@ -611,7 +764,7 @@ function step23(){
 	}
 
 	sortWorlds();
-	//step24();
+	step24();
 }
 
 function step22(){
@@ -1529,6 +1682,13 @@ function step15(){
 step15()
 
 //
+//do we have a garden world, and are we forcing a garden world?
+//
+if (forceGarden && !hasGarden){
+	return true;
+}
+
+//
 //now output shiz
 //
 
@@ -1569,6 +1729,8 @@ for (var n=0;n<stars.length;n++){
 		document.write("Planet: " + stars[n].starName + " " + planetInd + "<br/>");
 		document.write("Type: " + stars[n].worlds[planetInd].worldType + "<br/>");
 		document.write("Orbital Radius: " + stars[n].worlds[planetInd].orbitalRadius + "(AU) <br/>");
+		document.write("Moons: " + (stars[n].worlds[planetInd].resonantMoons + stars[n].worlds[planetInd].majorMoons + stars[n].worlds[planetInd].capturedMoons) + "<br/>");
+		document.write("Notes: " + stars[n].worlds[planetInd].features + "<br/>");
 		document.write("<br/>");
 		document.write("<br/>");
 	}
@@ -1600,3 +1762,6 @@ for (var n=0;n<stars.length;n++){
 	document.write("<br/>");
 }
 document.write("</code>");
+
+return false;
+}
