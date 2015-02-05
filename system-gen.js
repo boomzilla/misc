@@ -97,6 +97,13 @@ function moon(){
 	this.worldName = "ERROR";
 	this.features = "";
 	this.blackbodyTemp = -1.00;	//K
+	this.atmoMass = -1.0;
+	this.suffocatingAtmo = false;
+	this.corrosiveAtmo = false;
+	this.mToxicAtmo = false;
+	this.hToxicAtmo = false;
+	this.ltoxicAtmo = false;
+	this.marginalAtmo = new Array();
 }
 
 function world(orbitalRadius){
@@ -114,6 +121,13 @@ function world(orbitalRadius){
 	this.blackbodyTemp = -1.00;	//K
 	this.hasSulfurMoon = false;
 	this.testedSulfurMoon = false;
+	this.atmoMass = -1.0;
+	this.suffocatingAtmo = false;
+	this.corrosiveAtmo = false;
+	this.mToxicAtmo = false;
+	this.hToxicAtmo = false;
+	this.ltoxicAtmo = false;
+	this.marginalAtmo = new Array();
 }
 
 function starObj(){
@@ -484,6 +498,38 @@ function sortWorlds(){
 	}
 }
 
+function noAtmo(thisWorld){
+	if (thisWorld.size == "tiny"){
+		return true;
+	} else if (thisWorld.size == "small" && (thisWorld.subType == "hadean" || thisWorld.subType == "rock")){
+		return true;
+	} else if (thisWorld.size == "standard" && (thisWorld.subType == "hadean" || thisWorld.subType == "chthonian")){
+		return true;
+	} else if (thisWorld.size == "large" && thisWorld.subType == "chthonian"){
+		return true;
+	}
+	return false;
+}
+
+function step26(){
+	//atmosphere
+	//refer also to step 3
+	for (n = 0; n < stars[0].worlds.length; n++){
+		if (stars[0].worlds[n].worldType == "terrestrial"){
+			if (!noAtmo(stars[0].worlds[n])){
+				stars[0].worlds[n].atmoMass = doRoll(3,0)/10.0;
+			}
+		}
+
+		//now loop through major moons
+		for (moonInd = 0; moonInd < stars[0].worlds[n].moonSystem.length; moonInd++){
+			if (!noAtmo(stars[0].worlds[n].moonSystem[moonInd])){
+				stars[0].worlds[n].moonSystem[moonInd].atmoMass = doRoll(3,0)/10.0;
+			}
+		}
+	}
+}
+
 function step25(){
 	//world types
 	for (n = 0; n < stars[0].worlds.length; n++){
@@ -628,6 +674,7 @@ function step25(){
 			}
 		}
 	}
+	step26();
 }
 
 function step24(){
@@ -937,7 +984,7 @@ function step22(){
 			while (true) {
 				prevOrbit = presentOrbit;
 				presentOrbit *= orbitalSpacingTable(doRoll(3,0));
-				if (presentOrbit > stars[n].innerLimitRadius){
+				if (presentOrbit > stars[n].outerLimitRadius){
 					break;
 				}
 				stars[n].orbits.push(presentOrbit);
