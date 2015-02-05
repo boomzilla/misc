@@ -96,6 +96,7 @@ function moon(){
 	this.size = "ERROR"; 	//abstract size (large, medium, small, tiny)
 	this.worldName = "ERROR";
 	this.features = "";
+	this.blackbodyTemp = -1.00;	//K
 }
 
 function world(orbitalRadius){
@@ -110,6 +111,9 @@ function world(orbitalRadius){
 	this.majorMoons = 0;	//count of major moons
 	this.capturedMoons = 0;	//count of captured asteroid moons
 	this.moonSystem = new Array(); //will hold moon objects for major moons
+	this.blackbodyTemp = -1.00;	//K
+	this.hasSulfurMoon = false;
+	this.testedSulfurMoon = false;
 }
 
 function starObj(){
@@ -482,6 +486,148 @@ function sortWorlds(){
 
 function step25(){
 	//world types
+	for (n = 0; n < stars[0].worlds.length; n++){
+		if (stars[0].worlds[n].worldType == "terrestrial"){
+			stars[0].worlds[n].blackbodyTemp = 278 * (Math.pow(stars[0].lumin, 0.25)) / Math.sqrt(stars[0].worlds[n].orbitalRadius);
+			if (stars[0].worlds[n].size == "tiny"){
+				if (stars[0].worlds[n].blackbodyTemp <= 140){
+					stars[0].worlds[n].subType = "ice";
+				} else {
+					stars[0].worlds[n].subType = "rock";
+				} 
+			} else if (stars[0].worlds[n].size == "small"){
+				if (stars[0].worlds[n].blackbodyTemp <= 80){
+					stars[0].worlds[n].subType = "hadean";
+				} else if (stars[0].worlds[n].blackbodyTemp <= 140){
+					stars[0].worlds[n].subType = "ice";
+				} else {
+					stars[0].worlds[n].subType = "rock";
+				}
+			} else if (stars[0].worlds[n].size == "standard"){
+				if (stars[0].worlds[n].blackbodyTemp <= 80){
+					stars[0].worlds[n].subType = "hadean";
+				} else if (stars[0].worlds[n].blackbodyTemp <= 150){
+					stars[0].worlds[n].subType = "ice";
+				} else if (stars[0].worlds[n].blackbodyTemp <= 230){
+					if (stars[0].mass <= 0.65){
+						stars[0].worlds[n].subType = "ammonia";
+					} else {
+						stars[0].worlds[n].subType = "ice";
+					}
+				} else if (stars[0].worlds[n].blackbodyTemp <= 240){
+					stars[0].worlds[n].subType = "ice";
+				} else if (stars[0].worlds[n].blackbodyTemp <= 320){
+					gardenMod = Math.floor(sysAge / 0.5);
+					if (gardenMod > 10){
+						gardenMod = 10;
+					}
+					if (doRoll(3,gardenMod) > 17){
+						stars[0].worlds[n].subType = "garden";
+						hasGarden = true;
+					} else {
+						stars[0].worlds[n].subType = "ocean";
+					}
+				} else if (stars[0].worlds[n].blackbodyTemp <= 500){
+					stars[0].worlds[n].subType = "greenhouse";
+				} else {
+					stars[0].worlds[n].subType = "chthonian";
+				}
+			} else {
+				//large terrestrial
+				if (stars[0].worlds[n].blackbodyTemp <= 150){
+					stars[0].worlds[n].subType = "ice";
+				} else if (stars[0].worlds[n].blackbodyTemp <= 230){
+					if (stars[0].mass <= 0.65){
+						stars[0].worlds[n].subType = "ammonia";
+					} else {
+						stars[0].worlds[n].subType = "ice";
+					}
+				} else if (stars[0].worlds[n].blackbodyTemp <= 240){
+					stars[0].worlds[n].subType = "ice";
+				} else if (stars[0].worlds[n].blackbodyTemp <= 320){
+					gardenMod = Math.floor(sysAge / 0.5);
+					if (gardenMod > 5){
+						gardeMod = 5;
+					}
+
+					if (doRoll(3,gardenMod) > 17){
+						stars[0].worlds[n].subType = "garden";
+						hasGarden = true;
+					} else {
+						stars[0].worlds[n].subType = "ocean";
+					}
+				} else if (stars[0].worlds[n].blackbodyTemp <= 500){
+					stars[0].worlds[n].subType = "greenhouse";
+				} else {
+					stars[0].worlds[n].subType = "chthonian";
+				}
+			}
+		} else if (stars[0].worlds[n].worldType == "gas giant"){
+			stars[0].worlds[n].subType = "gas giant";
+		} else {
+			stars[0].worlds[n].subType = "astroid belt";
+		}
+
+		//now loop through major moons
+		for (moonInd = 0; moonInd < stars[0].worlds[n].moonSystem.length; moonInd++){
+			stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp = 278 * (Math.pow(stars[0].lumin, 0.25)) / Math.sqrt(stars[0].worlds[n].orbitalRadius);
+			if (stars[0].worlds[n].moonSystem[moonInd].size == "tiny"){
+				if (stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp <= 140){
+					if (!stars[0].worlds[n].testedSulfurMoon){
+						stars[0].worlds[n].testedSulfurMoon = true;
+						if (doRoll(1,0) < 4){
+							stars[0].worlds[n].hasSulfurMoon = true;
+							stars[0].worlds[n].moonSystem[moonInd].subType = "sulfur";
+						} else {
+							stars[0].worlds[n].moonSystem[moonInd].subType = "ice";
+						}
+					} else {
+						stars[0].worlds[n].moonSystem[moonInd].subType = "ice";
+					}
+				} else {
+					stars[0].worlds[n].moonSystem[moonInd].subType = "rock";
+				}
+			} else if (stars[0].worlds[n].moonSystem[moonInd].size == "small"){
+				if (stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp <= 80){
+					stars[0].worlds[n].moonSystem[moonInd].subType = "hadean";
+				} else if (stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp <= 140) {
+					stars[0].worlds[n].moonSystem[moonInd].subType = "ice";
+				} else {
+					stars[0].worlds[n].moonSystem[moonInd].subType = "rock";
+				}
+			} else {
+				//standard-sized world
+				if (stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp <= 80){
+					stars[0].worlds[n].moonSystem[moonInd].subType = "hadean";
+				} else if (stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp <= 150){
+					stars[0].worlds[n].moonSystem[moonInd].subType = "ice";
+				} else if (stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp <= 230){
+					if (stars[0].mass <= 0.65){
+						stars[0].worlds[n].moonSystem[moonInd].subType = "ammonia";
+					} else {
+						stars[0].worlds[n].moonSystem[moonInd].subType = "ice";
+					}
+				} else if (stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp <= 240){
+					stars[0].worlds[n].moonSystem[moonInd].subType = "ice";
+				} else if (stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp <= 320){
+					gardenMod = Math.floor(sysAge / 0.5);
+					if (gardenMod > 10){
+						gardenMod = 10;
+					}
+					if (doRoll(3,gardenMod) > 17){
+						stars[0].worlds[n].moonSystem[moonInd].subType = "garden";
+						hasGarden = true;
+					} else {
+						stars[0].worlds[n].moonSystem[moonInd].subType = "ocean";
+					}
+				} else if (stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp <= 500){
+					stars[0].worlds[n].moonSystem[moonInd].subType = "ocean";
+				} else {
+					stars[0].worlds[n].moonSystem[moonInd].subType = "chthonian"
+				}
+			}
+		}
+	}
 }
 
 function step24(){
@@ -504,7 +650,7 @@ function step24(){
 			if (resMoon > 0){
 				stars[0].worlds[n].resonantMoons = resMoon;
 				if (resMoon > 9){
-					stars[0].world[n].features += "* spectacular ring system<br/>"
+					stars[0].worlds[n].features += "* spectacular ring system<br/>"
 				}
 			}
 			
@@ -1727,10 +1873,10 @@ for (var n=0;n<stars.length;n++){
 	document.write("<br/>");
 	for (var planetInd = 0; planetInd<stars[n].worlds.length; planetInd++){
 		document.write("Planet: " + stars[n].starName + " " + planetInd + "<br/>");
-		document.write("Type: " + stars[n].worlds[planetInd].worldType + "<br/>");
+		document.write("Type: " + stars[n].worlds[planetInd].subType + "<br/>");
 		document.write("Orbital Radius: " + stars[n].worlds[planetInd].orbitalRadius + "(AU) <br/>");
 		document.write("Moons: " + (stars[n].worlds[planetInd].resonantMoons + stars[n].worlds[planetInd].majorMoons + stars[n].worlds[planetInd].capturedMoons) + "<br/>");
-		document.write("Notes: " + stars[n].worlds[planetInd].features + "<br/>");
+		document.write("Notes: <br/>" + stars[n].worlds[planetInd].features + "<br/>");
 		document.write("<br/>");
 		document.write("<br/>");
 	}
