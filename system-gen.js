@@ -420,23 +420,139 @@ function orbitalSpacingTable(diceRoll){
 	}
 }
 
+function gasGiantSizeTable(roll){
+	if (roll < 11){
+		return "small";
+	} else if (roll < 17){
+		return "medium";
+	} else {
+		return "large";
+	}
+}
+
 function step23(){
-	document.write("STEP 23");
+	//document.write("STEP 23");
 	//PLACE WORLDS
 	//just assume one star for now
+	var terrestrials = new Array();
+
 	if (stars[0].hasGasGiant){
-		var firstGasGiant = new world(stars[0].orbits.reverse().pop());
+		var firstGasGiant = new world(stars[0].orbits[0]);
 		firstGasGiant.worldType = "gas giant";
 		stars[0].worlds.push(firstGasGiant);
 		stars[0].planetCount++;
 
+		//find the orbit just beyond the snow line
+		firstBeyond = -1;	
+		for (var n = 0; n < stars[0].orbits.length; n++){
+			if (stars[0].orbits[n] > stars[0].snowLine && (firstBeyond = -1 || stars[0].orbits[firstBeyond] > stars[0].orbits[n])){
+				firstBeyond = n;
+			}
+		}
 
-					stars[0].gasGiantArrangement == "conventional";
+		//determine size of firstGasGiant
+		if (stars[0].worlds[0].orbitalRadius < stars[0].snowLine || firstBeyond == 0){
+			stars[0].worlds[0].size = gasGiantSizeTable(3, 4);
+		} else {
+			stars[0].worlds[0].size = gasGiantSizeTable(3,0);
+		}
+
+		for (var n = 1; n < stars[0].orbits.length; n++){
+			if ((stars[0].gasGiantArrangement == "conventional" && stars[0].orbits[n] > stars[0].snowLine) && doRoll(3,0) < 16)
+			{
+				//this is a gas giant
+				var aGasGiant = new world(stars[0].orbits[n]);
+				aGasGiant.worldType = "gas giant";
+				if (n == firstBeyond){
+					aGasGiant.size = gasGiantSizeTable(3,4);
+				} else {
+					aGasGiant.size = gasGiantSizeTable(3,0);
+				}
+				stars[0].worlds.push(aGasGiant);
+				stars[0].planetCount++;
+			} else if((stars[0].gasGiantArrangement == "eccentric" && stars[0].orbits[n] < stars[0].snowLine) && doRoll(3,0) < 9){
+				//this is a gas giant inside snow line
+				var aGasGiant = new world(stars[0].orbits[n]);
+				aGasGiant.worldType = "gas giant";
+				aGasGiant.size = gasGiantSizeTable(3,4);
+				stars[0].worlds.push(aGasGiant);
+				stars[0].planetCount++;
+			} else if ((stars[0].gasGiantArrengement == "eccentric" && stars[0].orbits[n] > stars[0].snowLine) && doRoll(3,0) < 15){
+				//this is a gas giant beyond snow line
+				var aGasGiant = new world(stars[0].orbits[n]);
+				aGasGiant.worldType = "gas giant";
+				if (n == firstBeyond){
+					aGasGiant.size = gasGiantSizeTable(3,4);
+				} else {
+					aGasGiant.size = gasGiantSizeTable(3,0);
+				}
+				stars[0].worlds.push(aGasGiant);
+				stars[0].planetCount++;
+			} else if ((stars[0].gasGiantArrangement == "epistellar" && stars[0].orbits[n] < stars[0].snowLine) && doRoll(3,0) < 7){
+				//this is a gas giant inside snow line
+				var aGasGiant = new world(stars[0].orbits[n]);
+				aGasGiant.worldType = "gas giant";
+				aGasGiant.size = gasGiantSizeTable(3,4);
+				stars[0].worlds.push(aGasGiant);
+				stars[0].planetCount++;
+			} else if ((stars[0].gasGiantArrangement == "epistellar" && stars[0].orbits[n] > stars[0].snowLine) && doRoll(3,0) < 15){
+				//this is a gas giant beyond snow line
+				var aGasGiant = new world(stars[0].orbits[n]);
+				aGasGiant.worldType = "gas giant";
+				if (n == firstBeyond){
+					aGasGiant.size = gasGiantSizeTable(3,4);
+				} else {
+					aGasGiant.size = gasGiantSizeTable(3,0);
+				}
+				stars[0].worlds.push(aGasGiant);
+				stars[0].planetCount++;
+			} else {
+				//this is an empty or asteroid or terrestrial orbit
+				terrestrials.push(stars[0].orbits[n]);
+			}
+		}
+	}
+
+	stars[0].orbits.sort();
+	//okay, now iterate through set of potential terrestrials, empties, asteroids
+	for (var n = 0; n < terrestrials.length; n++){
+		modifier = 0;
+		orbitContent = doRoll(3,modifier);
+		if (orbitContent > 15){
+			var aPlanet = new world(terrestrials[n]);
+			aPlanet.worldType = "terrestrial";
+			aPlanet.size = "large";
+			stars[0].worlds.push(aPlanet);
+			stars[0].planetCount++;
+		} else if (orbitContent > 11){
+			var aPlanet = new world(terrestrials[n]);
+			aPlanet.worldType = "terrestrial";
+			aPlanet.size = "standard";
+			stars[0].worlds.push(aPlanet);
+			stars[0].planetCount++;
+		} else if (orbitContent > 8){
+			var aPlanet = new world(terrestrials[n]);
+			aPlanet.worldType = "terrestrial";
+			aPlanet.size = "small";
+			stars[0].worlds.push(aPlanet);
+			stars[0].planetCount++;
+		} else if (orbitContent > 6){
+			var aPlanet = new world(terrestrials[n]);
+			aPlanet.worldType = "terrestrial";
+			aPlanet.size = "tiny";
+			stars[0].worlds.push(aPlanet);
+			stars[0].planetCount++;
+		} else if (orbitContent > 3){
+			var belt = new world(terrestrials[n]);
+			belt.worldType = "asteroid belt";
+			belt.size = "asteroid belt";
+			stars[0].worlds.push(belt);
+		} //else, it's an empty orbit
 	}
 }
 
 function step22(){
-	document.write("STEP 22");
+	//document.write("STEP 22");
 	//place planetary orbits
 	for (var n = 0; n < stars.length; n++){
 		if (stars[n].orbits > 0){
@@ -484,7 +600,7 @@ function step22(){
 }
 
 function step21(){
-	document.write("STEP 21");
+	//document.write("STEP 21");
 	//placing first planets
 	for (var n = 0; n < stars.length; n++){
 		gasGiantArrangement = doRoll(3, 0);
@@ -513,7 +629,7 @@ function step21(){
 }
 
 function step20(){
-	document.write("STEP 20");
+	//document.write("STEP 20");
 	//locate orbital zones
 	for (var n = 0; n < stars.length; n++){
 		//determine inner limit radius
@@ -550,7 +666,7 @@ function step20(){
 }
 
 function step19(){
-	document.write("STEP 19");
+	//document.write("STEP 19");
 	//companion star orbits
 	for (var n = 1; n < stars.length; n++){
 		//only iterate thru companion stras, duh
