@@ -1,4 +1,4 @@
-var forceGarden = false;
+var forceGarden = true;
 
 do{
 	forceGarden = makeSolarSystem();
@@ -9,7 +9,7 @@ var hasGarden = false;
 var stars=new Array();
 sysName = generateName();
 sysAge = -1.0; //billions of years
-document.write("<h1>" + sysName + " System</h1>");
+
 var rollSeq = "";
 readFrom = false;
 forceSingleStar = true;	//just have single star systems for now
@@ -1837,6 +1837,8 @@ if (forceGarden && !hasGarden){
 //
 //now output shiz
 //
+
+document.write("<h1>" + sysName + " System</h1>");
 
 document.write("<a href=\"#diceRolls\">Dice Roll Sequence</a><br/>");
 document.write("<a href=\"#systemOverviewText\">System Overview (plaintext)</a><br/>");
