@@ -993,46 +993,51 @@ function step22(){
 		if (stars[n].orbits.length > 0){
 			//if there is already a gas giant orbit established in step 21
 			//work inward
-			document.write("line 996 <br/>");
+			//document.write("line 996 <br/>");
 			presentOrbit = stars[n].orbits[0];
+			prevOrbit = presentOrbit;
 			while (true) {
-				prevOrbit = presentOrbit;
-				document.write(presentOrbit + "<br/>");
+				//document.write(presentOrbit + "<br/>");
 				presentOrbit /= orbitalSpacingTable(doRoll(3,0));
 				if (presentOrbit < stars[n].innerLimitRadius || presentOrbit < stars[n].radius){
 					break;
 				}
 				if (prevOrbit - presentOrbit > 0.15){
-					document.write("line 1005<br/>");
+					//document.write("line 1005<br/>");
 					stars[n].orbits.push(presentOrbit);
+					prevOrbit = presentOrbit;
 				}
 			}
 
 			//work outward
 			presentOrbit = stars[n].orbits[0];
+			prevOrbit = presentOrbit;
 			//document.write("presentRobit: " + pres);
 			while (true) {
-				prevOrbit = presentOrbit;
+				//prevOrbit = presentOrbit;
 				presentOrbit *= orbitalSpacingTable(doRoll(3,0));
 				if (presentOrbit > stars[n].outerLimitRadius){
 					break;
 				}
 				if (presentOrbit - prevOrbit > 0.15){
 					stars[n].orbits.push(presentOrbit);
+					prevOrbit = presentOrbit;
 				}
 			}
 		} else {
 			//if there are no gas giants
 			//work inward from outerLimitRadius
 			presentOrbit = stars[n].outerLimitRadius / (1 + doRoll(1,0)*0.05);
+			prevOrbit = presentOrbit;
 			while (true) {
-				prevOrbit = presentOrbit;
+				//prevOrbit = presentOrbit;
 				presentOrbit /= orbitalSpacingTable(doRoll(3,0));
 				if (presentOrbit < stars[n].innerLimitRadius || presentOrbit < stars[n].radius){
 					break;
 				}
 				if (prevOrbit - presentOrbit > 0.15){
 					stars[n].orbits.push(presentOrbit);
+					prevOrbit = presentOrbit;
 				}
 			}
 		} 
