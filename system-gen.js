@@ -993,20 +993,24 @@ function step22(){
 		if (stars[n].orbits.length > 0){
 			//if there is already a gas giant orbit established in step 21
 			//work inward
+			document.write("line 996 <br/>");
 			presentOrbit = stars[n].orbits[0];
 			while (true) {
 				prevOrbit = presentOrbit;
+				document.write(presentOrbit + "<br/>");
 				presentOrbit /= orbitalSpacingTable(doRoll(3,0));
 				if (presentOrbit < stars[n].innerLimitRadius || presentOrbit < stars[n].radius){
 					break;
 				}
 				if (prevOrbit - presentOrbit > 0.15){
+					document.write("line 1005<br/>");
 					stars[n].orbits.push(presentOrbit);
 				}
 			}
 
 			//work outward
-			prsentOrbit = stars[n].orbits[0];
+			presentOrbit = stars[n].orbits[0];
+			//document.write("presentRobit: " + pres);
 			while (true) {
 				prevOrbit = presentOrbit;
 				presentOrbit *= orbitalSpacingTable(doRoll(3,0));
