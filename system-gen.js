@@ -104,6 +104,7 @@ function moon(){
 	this.hToxicAtmo = false;
 	this.ltoxicAtmo = false;
 	this.marginalAtmo = new Array();
+	this.vac = false;	//true if the world has no atmosphere
 }
 
 function world(orbitalRadius){
@@ -128,6 +129,7 @@ function world(orbitalRadius){
 	this.hToxicAtmo = false;
 	this.ltoxicAtmo = false;
 	this.marginalAtmo = new Array();
+	this.vac = false;	//true if the world has no atmosphere
 }
 
 function starObj(){
@@ -511,9 +513,51 @@ function noAtmo(thisWorld){
 	return false;
 }
 
+function determineMarginal(){
+	marg = doRoll(3,0);
+	switch(marg){
+		case 3:
+		case 4:
+			return "chlorine";
+		case 5:
+		case 6:
+			return "sulfur compounds";
+		case 7:
+			return "nitrogen compounds";
+		case 8:
+		case 9:
+			return "organic toxins";
+		case 10:
+		case 11:
+			return "low oxygen";
+		case 12:
+		case 13:
+			return "pollutants";
+		case 14:
+			return "high carbon dioxide";
+		case 15:
+		case 16:
+			return "high oxygen";
+		default:
+			return "inert gases";
+	}
+}
+
+function step27(){
+	//HYDROGRAPHIC COVERAGE
+	//also refer to step 4 in book
+
+	//loop thru planets
+	for (n = 0; n < stars[0].worlds.length; n++){
+		//now loop through this planet's major moons
+		for (moonInd = 0; moonInd < stars[0].worlds[n].moonSystem.length; moonInd++){
+		}
+	}
+}
+
 function step26(){
 	//atmosphere
-	//refer also to step 3
+	//refer also to step 3 in book
 	for (n = 0; n < stars[0].worlds.length; n++){
 		if (stars[0].worlds[n].worldType == "terrestrial"){
 			if (!noAtmo(stars[0].worlds[n])){
@@ -526,11 +570,42 @@ function step26(){
 						stars[0].worlds[n].suffocatingAtmo = true;
 						stars[0].worlds[n].hToxicAtmo = true;
 					}
-				} else if (stars[0].worlds[n].size == "standard" && stars[0].worlds[n].subType == "ammonia"){
+				} else if (stars[0].worlds[n].subType == "ammonia"){
 					stars[0].worlds[n].suffocatingAtmo = true;
 					stars[0].worlds[n].lToxicAtmo = true;
 					stars[0].worlds[n].corrosiveAtmo = true;
+				} else if (stars[0].worlds[n].size == "standard" && stars[0].worlds[n].subType == "ice"){
+					if (doRoll(3,0) < 13){
+						stars[0].worlds[n].suffocatingAtmo = true;
+					} else {
+						stars[0].worlds[n].suffocatingAtmo = true;
+						stars[0].worlds[n].mToxicAtmo = true;
+					}
+				} else if(stars[0].worlds[n].size == "standard" && stars[0].worlds[n].subType == "ocean"){
+					if (doRoll(3,0) < 13){
+						stars[0].worlds[n].suffocatingAtmo = true;
+					} else {
+						stars[0].worlds[n].suffocatingAtmo = true;
+						stars[0].worlds[n].mToxicAtmo = true;
+					}
+				} else if (stars[0].worlds[n].subType == "garden"){
+					if (doRoll(3,0)>11){
+						stars[0].worlds[n].marginalAtmo.push(determineMarginal());
+					}
+				} else if (tars[0].worlds[n].subType == "greenhouse"){
+					stars[0].worlds[n].suffocatingAtmo = true;
+					stars[0].worlds[n].lToxicAtmo = true;
+					stars[0].worlds[n].corrosiveAtmo = true;
+				} else if (stars[0].worlds[n].size == "large" && stars[0].worlds[n].subType == "ice"){
+					stars[0].worlds[n].suffocatingAtmo = true;
+					stars[0].worlds[n].hToxicAtmo = true;
+				} else {
+					//large ocean world
+					stars[0].worlds[n].suffocatingAtmo = true;
+					stars[0].worlds[n].hToxicAtmo = true;
 				}
+			} else {
+				stars[0].worlds[n].vac = true;
 			}
 		}
 
@@ -550,10 +625,36 @@ function step26(){
 					stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
 					stars[0].worlds[n].moonSystem[moonInd].lToxicAtmo = true;
 					stars[0].worlds[n].moonSystem[moonInd].corrosiveAtmo = true;
+				} else if (stars[0].worlds[n].moonSystem[moonInd].size == "standard" && stars[0].worlds[n].moonSystem[moonInd].subType == "ice"){
+					if(doRoll(3,0) < 13){
+						stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
+					} else {
+						stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
+						stars[0].worlds[n].moonSystem[moonInd].mToxicAtmo = true;
+					}
+				} else if (stars[0].worlds[n].moonSystem[moonInd].size == "standard" && stars[0].worlds[n].moonSystem[moonInd].subType == "ocean"){
+					if(doRoll(3,0) < 13){
+						stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
+					} else {
+						stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
+						stars[0].worlds[n].moonSystem[moonInd].mToxicAtmo = true;
+					}
+				} else if (stars[0].worlds[n].moonSystem[moonInd].size == "standard" && stars[0].worlds[n].moonSystem[moonInd].subType == "garden"){
+					if (doRoll(3,0)>11){
+						stars[0].worlds[n].moonSystem[moonInd].marginalAtmo.push(determineMarginal());
+					}
+				} else {
+					//standard-sized greenhouse moon
+					stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
+					stars[0].worlds[n].moonSystem[moonInd].lToxicAtmo = true;
+					stars[0].worlds[n].moonSystem[moonInd].corrosiveAtmo = true;
 				}
+			} else {
+				stars[0].worlds[n].moonSystem[moonInd].vac = true;
 			}
 		}
 	}
+	step27();
 }
 
 function step25(){
@@ -1931,7 +2032,7 @@ document.write("<a name=\"#diceRolls\">Dice rolls:</a><br/>");
 document.write(rollSeq);
 document.write("<br/>");
 
-document.write("<h2><a name=\"#systemOverviewText\">System Overview (plaintext):</a></h2>");
+document.write("<h2><a name=\"systemOverviewText\">System Overview (plaintext):</a></h2>");
 document.write("<br/>");
 document.write("<code>");
 
@@ -1971,7 +2072,7 @@ for (var n=0;n<stars.length;n++){
 //output markup
 document.write("</code>");
 
-document.write("<h2><a name=\"#systemOverview\">System Overview (markup):</a></h2>");
+document.write("<h2><a name=\"systemOverview\">System Overview (markup):</a></h2>");
 document.write("<hr/>");
 document.write("<code>");
 
