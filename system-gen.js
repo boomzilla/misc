@@ -570,7 +570,7 @@ function getAbsorptionFactor(worldType, size, hydro){
 		} else if (worldType =="rock"){
 			return 0.96;
 		}
-	} else if (size == "standard" && worldType = "hadean"){
+	} else if (size == "standard" && worldType == "hadean"){
 		return 0.67;
 	} else if (size == "standard" || size == "large"){
 		if (worldType == "ammonia"){
@@ -2159,6 +2159,8 @@ document.write("<h1>" + sysName + " System</h1>");
 
 document.write("<a href=\"#diceRolls\">Dice Roll Sequence</a><br/>");
 document.write("<a href=\"#systemOverviewText\">System Overview (plaintext)</a><br/>");
+document.write("<a href=\"#planetsText\">Planets (plaintext)</a><br/>");
+document.write("<a href=\"#moonsText\">Moons (plaintext)</a><br/>");
 document.write("<a href=\"#systemOverview\">System Overview (markup)</a><br/>");
 document.write("<a name=\"#diceRolls\">Dice rolls:</a><br/>");
 document.write(rollSeq);
@@ -2191,12 +2193,44 @@ for (var n=0;n<stars.length;n++){
 	document.write("<br/>");
 	document.write("<br/>");
 	for (var planetInd = 0; planetInd<stars[n].worlds.length; planetInd++){
-		document.write("Planet: " + stars[n].starName + " " + planetInd + "<br/>");
+		document.write("Planet: " + stars[n].starName + " " + (planetInd + 1) + "<br/>");
 		document.write("Type: " + stars[n].worlds[planetInd].subType + "<br/>");
 		document.write("Orbital Radius: " + stars[n].worlds[planetInd].orbitalRadius + "(AU) <br/>");
+		document.write("Hydrosphere: " + stars[n].worlds[planetInd].hydro + "% <br/>");
 		document.write("Moons: " + (stars[n].worlds[planetInd].resonantMoons + stars[n].worlds[planetInd].majorMoons + stars[n].worlds[planetInd].capturedMoons) + "<br/>");
 		document.write("Notes: <br/>" + stars[n].worlds[planetInd].features + "<br/>");
 		document.write("<br/>");
+		document.write("<br/>");
+	}
+}
+
+//describe planets in plaintext
+document.write("<h2><a name=\"planetsText\">planets (plaintext):</a></h2>");
+document.write("<br/>");
+for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
+	document.write("<h2>" + stars[0].starName + " " + (planetInd + 1) + "</h2>");
+	document.write("<h3>Basic Info</h3>");
+	document.write("Planet name: " + stars[0].starName + " " + (planetInd + 1) + "<br/>");
+	document.write("System: " + stars[0].starName + "<br/>");
+	document.write("Orbit: " + (planetInd + 1) + "<br/>");
+	document.write("Moons: " + (stars[0].worlds[planetInd].resonantMoons + stars[0].worlds[planetInd].majorMoons + stars[0].worlds[planetInd].capturedMoons) + "<br/>");
+	document.write("<h3>Physics</h3>");
+	document.write("Type: " + stars[0].worlds[planetInd].size + " " + stars[0].worlds[planetInd].subType + "<br/>");
+
+	document.write("<br/>");
+}
+
+//describe moon in plaintext
+document.write("<h2><a name=\"moonsText\">major moons (plaintext):</a></h2>");
+document.write("<br/>");
+for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
+	for (var moonInd = 0; moonInd<stars[0].worlds[planetInd].moonSystem.length;moonInd++){
+		document.write("<h2>" + stars[0].starName + " " + (planetInd + 1) + " " + (moonInd + 1) + "</h2>");
+		document.write("<h3>Basic Info</h3>");
+		document.write("Moon name: " + stars[0].starName + " " + (planetInd + 1) + " " + (moonInd + 1) + "<br/>");
+		document.write("Planet: " + stars[0].starName + " " + (planetInd + 1) + "<br/>");
+		document.write("<h3>Physics</h3>");
+		document.write("Type: " + stars[0].worlds[planetInd].moonSystem[moonInd].size + " " + stars[0].worlds[planetInd].moonSystem[moonInd].subType + "<br/>");
 		document.write("<br/>");
 	}
 }
