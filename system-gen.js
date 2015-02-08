@@ -105,6 +105,10 @@ function moon(){
 	this.ltoxicAtmo = false;
 	this.marginalAtmo = new Array();
 	this.vac = false;	//true if the world has no atmosphere
+	this.hydro = 0;	//hydrographic covereage, by percentrage of surface
+	this.hydroType;	//chemical ocean (water or otherwise) on surface
+	this.averageSurfaceTemp = -1.00;	//average surface temp in K
+	this.climateType = "ERROR";
 }
 
 function world(orbitalRadius){
@@ -130,6 +134,10 @@ function world(orbitalRadius){
 	this.ltoxicAtmo = false;
 	this.marginalAtmo = new Array();
 	this.vac = false;	//true if the world has no atmosphere
+	this.hydro = 0;	//hydrographic covereage, by percentrage of surface
+	this.hydroType;	//chemical ocean (water or otherwise) on surface
+	this.averageSurfaceTemp = -1.00;	//average surface temp in K
+	this.climateType = "ERROR";
 }
 
 function starObj(){
@@ -543,16 +551,140 @@ function determineMarginal(){
 	}
 }
 
+function getAbsorptionFactor(worldType, size, hydro){
+	if (worldType == "asteroid belt"){
+		return 0.97;
+	} else if (size == "tiny"){
+		if (worldType == "ice"){
+			return 0.86;
+		} else if (worldType =="rock"){
+			return 0.97;
+		} else if (worldType =="sulfur"){
+			return 0.77;
+		}
+	} else if (size == "small"){
+		if (worldType == "hadean"){
+			return 0.67;
+		} else if (worldType =="ice"){
+			return 0.93;
+		} else if (worldType =="rock"){
+			return 0.96;
+		}
+	} else if (size == "standard" && worldType = "hadean"){
+		return 0.67;
+	} else if (size == "standard" || size == "large"){
+		if (worldType == "ammonia"){
+			return 0.84;
+		} else if (worldType =="ice"){
+			return 0.86;
+		} else if (worldType =="ocean" || worldType == "garden"){
+			if (hydro <= 20){
+				return 0.95;
+			} else if (hydro <= 50){
+				return 0.92;
+			} else if (hydro <= 90){
+				return 0.88;
+			} else {
+				return 0.84;
+			}
+		} else if (worldType == "greenhouse"){
+			return 0.77;
+		} else if (worldType == "chthonian"){
+			return 0.97;
+		}
+	}
+}
+
+function getGreenhouseFactor(worldType, size){
+	if (worldType == "ice" && size == "small"){
+		return 0.10;
+	} else if (size == "standard" || size == "large"){
+		if (worldType == "ammonia" || worldType == "ice"){
+			return 0.20;
+		} else if (worldType =="garden" || worldType == "ocean"){
+			return 0.16;
+		} else if (worldType == "greenhouse"){
+			return 2.0;
+		}
+	}
+
+	return 0;
+}
+
+function blackbodyCorrection(worldType, size, atmoMass, hydro){
+	return getAbsorptionFactor(worldType, size, hydro) * (1 + (atmoMass * getGreenhouseFactor(worldType, size)));
+}
+
+function getClimateType(temp){
+	if (temp < 244){
+		return "frozen";
+	} else if (temp < 255){
+		return "very cold";
+	} else if (temp < 266){
+		return "cold";
+	} else if (temp < 278){
+		return "chilly";
+	} else if (temp < 289){
+		return "cool";
+	} else if (temp < 300){
+		return "normal";
+	} else if (temp < 311){
+		return "warm";
+	} else if (temp < 322){
+		return "tropical";
+	} else if (temp < 333){
+		return "hot";
+	} else if (temp < 344){
+		return "very hot";
+	} else {
+		return "infernal";
+	}
+}
+
+function step28(){
+	//climate
+	//refer also to step 5 in book
+	for (n = 0; n < stars[0].worlds.length; n++){
+		if (stars[0].worlds[n].worldType == "terrestrial"){
+			stars[0].worlds[n].averageSurfaceTemp = stars[0].worlds[n].blackbodyTemp * blackbodyCorrection(stars[0].worlds[n].subType,stars[0].worlds[n].size,stars[0].worlds[n].atmoMass,stars[0].worlds[n].hydro);
+			stars[0].worlds[n].climateType = getClimateType(stars[0].worlds[n].averageSurfaceTemp);
+		}
+		//now loop through this planet's major moons
+		for (moonInd = 0; moonInd < stars[0].worlds[n].moonSystem.length; moonInd++){
+			stars[0].worlds[n].moonSystem[moonInd].averageSurfaceTemp = stars[0].worlds[n].moonSystem[moonInd].blackbodyTemp * blackbodyCorrection(stars[0].worlds[n].moonSystem[moonInd].subType, stars[0].worlds[n].moonSystem[moonInd].size,stars[0].worlds[n].moonSystem[moonInd].atmoMass,stars[0].worlds[n].moonSystem[moonInd].hydro);
+			stars[0].worlds[n].moonSystem[moonInd].climateType = getClimateType(stars[0].worlds[n].moonSystem[moonInd].averageSurfaceTemp);
+		}
+	}
+}
+
 function step27(){
 	//HYDROGRAPHIC COVERAGE
 	//also refer to step 4 in book
 
 	//loop thru planets
 	for (n = 0; n < stars[0].worlds.length; n++){
+		if (stars[0].worlds[n].subType == "ocean" || stars[0].worlds[n].subType == "garden"){
+			stars[0].worlds[n].hydroType = "water";
+			if (stars[0].worlds[n].size == "standard"){
+				stars[0].worlds[n].hydro = 10 * doRoll(1, 4);
+			} else {
+				//large world
+				hydroRoll = 10 * doRoll(1,6);
+				if (hydroRoll > 100){
+					hydroRoll = 100;
+				}
+				stars[0].worlds[n].hydro = hydroRoll;
+			}
+		}
+
 		//now loop through this planet's major moons
 		for (moonInd = 0; moonInd < stars[0].worlds[n].moonSystem.length; moonInd++){
+			if (stars[0].worlds[n].moonSystem[moonInd].subType == "ocean" || stars[0].worlds[n].moonSystem[moonInd].subType == "garden"){
+				stars[0].worlds[n].moonSystem[moonInd].hydro = 10 * doRoll(1, 4);
+			}
 		}
 	}
+	step28();
 }
 
 function step26(){
@@ -592,7 +724,7 @@ function step26(){
 					if (doRoll(3,0)>11){
 						stars[0].worlds[n].marginalAtmo.push(determineMarginal());
 					}
-				} else if (tars[0].worlds[n].subType == "greenhouse"){
+				} else if (stars[0].worlds[n].subType == "greenhouse"){
 					stars[0].worlds[n].suffocatingAtmo = true;
 					stars[0].worlds[n].lToxicAtmo = true;
 					stars[0].worlds[n].corrosiveAtmo = true;
