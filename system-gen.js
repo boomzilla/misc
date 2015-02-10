@@ -109,6 +109,10 @@ function moon(){
 	this.hydroType;	//chemical ocean (water or otherwise) on surface
 	this.averageSurfaceTemp = -1.00;	//average surface temp in K
 	this.climateType = "ERROR";
+	this.density = -1.00;	//Earth densities
+	this.diameter = -1.00;	//Earth diameters
+	this.gravity = -1.00;	//surface gravity in Gs
+	this.mass = -1.00;	//mass in Earths
 }
 
 function world(orbitalRadius){
@@ -138,6 +142,10 @@ function world(orbitalRadius){
 	this.hydroType;	//chemical ocean (water or otherwise) on surface
 	this.averageSurfaceTemp = -1.00;	//average surface temp in K
 	this.climateType = "ERROR";
+	this.density = -1.00;	//Earth densities
+	this.diameter = -1.00;	//Earth diameters
+	this.gravity = -1.00;	//surface gravity in Gs
+	this.mass = -1.00;	//mass in Earths
 }
 
 function starObj(){
@@ -641,6 +649,133 @@ function getClimateType(temp){
 	}
 }
 
+function worldDensityTable(subType, size){
+	if ((size == "tiny" && (subType == "ice" || subType == "sulfur")) || ((size == "small" && subType == "ice") || (subType == "hadean" || subType == "ammonia"))){
+		//icy core
+		roll = doRoll(3,0);
+		switch(roll){
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+				return 0.3;
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+				return 0.4;
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+				return 0.5;
+			case 15:
+			case 16:
+			case 17:
+				return 0.6;
+			default:
+				return 0.7;
+		}
+	} else if (subType == "rock" && (size == "tiny" || size == "small")){
+		//small iron core
+		switch(roll){
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+				return 0.6;
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+				return 0.7;
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+				return 0.8;
+			case 15:
+			case 16:
+			case 17:
+				return 0.8;
+			default:
+				return 1.0;
+		}
+	} else {
+		//large iron core
+		switch(roll){
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+				return 0.8;
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+				return 0.9;
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+				return 1.0;
+			case 15:
+			case 16:
+			case 17:
+				return 1.1;
+			default:
+				return 1.2;
+		}
+	}
+}
+
+function getDiameter(temp, density, size){
+	min = 0.0;
+	max = 0.0;
+	if (size == "large"){
+		min = 0.065;
+		max = 0.091;
+	} else if (size == "standard"){
+		min = 0.030;
+		max = 0.065;
+	} else if (size == "small"){
+		min = 0.024;
+		max = 0.030;
+	} else {
+		//size == tiny
+		min = 0.004;
+		max = 0.024;
+	}
+
+	min *= Math.sqrt(temp/density);
+	max *= Math.sqrt(temp/density);
+
+	return min + ((max-min) * 0.1 * doRoll(2,-2));
+}
+
+function step29(){
+	//world size
+	//refer also to step 6 in book
+	for (n = 0; n < stars[0].worlds.length; n++){
+		thisWorld = stars[0].worlds[n];
+		if (thisWorld.worldType == "terrestrial"){
+			thisWorld.density = worldDensityTable(thisWorld.subType, thisWorld.size);
+			thisWorld.diameter = getDiameter(thisWorld.blackbodyTemp, thisWorld.density, thisWorld.size);
+			thisWorld.gravity = thisWorld.density * thisWorld.diameter;
+			thisWorld.mass = thisWorld.density * Math.pow(thisWorld.diameter,3);
+		}
+
+		//now loop through this planet's major moons
+		for (moonInd = 0; moonInd < thisWorld.moonSystem.length; moonInd++){
+			thisMoon = thisWorld.moonSystem[moonInd];
+			thisMoon.density = worldDensityTable(thisMoon.subType, thisMoon.size);
+			thisMoon.diameter = getDiameter(thisMoon.blackbodyTemp, thisMoon.density, thisMoon.size);
+			thisMoon.gravity = thisMoon.density * thisMoon.diameter;
+			thisMoon.mass = thisMoon.density * Math.pow(thisMoon.diameter,3);
+		}
+	}
+}
+
 function step28(){
 	//climate
 	//refer also to step 5 in book
@@ -655,6 +790,7 @@ function step28(){
 			stars[0].worlds[n].moonSystem[moonInd].climateType = getClimateType(stars[0].worlds[n].moonSystem[moonInd].averageSurfaceTemp);
 		}
 	}
+	step29();
 }
 
 function step27(){
@@ -673,14 +809,14 @@ function step27(){
 				if (hydroRoll > 100){
 					hydroRoll = 100;
 				}
-				stars[0].worlds[n].hydro = hydroRoll;
+				stars[0].worlds[n].hydro = hydroRoll  - Math.floor((Math.random()*10));
 			}
 		}
 
 		//now loop through this planet's major moons
 		for (moonInd = 0; moonInd < stars[0].worlds[n].moonSystem.length; moonInd++){
 			if (stars[0].worlds[n].moonSystem[moonInd].subType == "ocean" || stars[0].worlds[n].moonSystem[moonInd].subType == "garden"){
-				stars[0].worlds[n].moonSystem[moonInd].hydro = 10 * doRoll(1, 4);
+				stars[0].worlds[n].moonSystem[moonInd].hydro = 10 * doRoll(1, 4) - Math.floor((Math.random()*10));
 			}
 		}
 	}
@@ -1081,9 +1217,9 @@ function step23(){
 
 		//determine size of firstGasGiant
 		if (stars[0].worlds[0].orbitalRadius < stars[0].snowLine || firstBeyond == 0){
-			stars[0].worlds[0].size = gasGiantSizeTable(3, 4);
+			stars[0].worlds[0].size = gasGiantSizeTable(doRoll(3, 4));
 		} else {
-			stars[0].worlds[0].size = gasGiantSizeTable(3,0);
+			stars[0].worlds[0].size = gasGiantSizeTable(doRoll(3,0));
 		}
 
 		for (var n = 1; n < stars[0].orbits.length; n++){
@@ -1093,9 +1229,9 @@ function step23(){
 				var aGasGiant = new world(stars[0].orbits[n]);
 				aGasGiant.worldType = "gas giant";
 				if (n == firstBeyond){
-					aGasGiant.size = gasGiantSizeTable(3,4);
+					aGasGiant.size = gasGiantSizeTable(doRoll(3,4));
 				} else {
-					aGasGiant.size = gasGiantSizeTable(3,0);
+					aGasGiant.size = gasGiantSizeTable(doRoll(3,0));
 				}
 				stars[0].worlds.push(aGasGiant);
 				stars[0].planetCount++;
@@ -1103,7 +1239,7 @@ function step23(){
 				//this is a gas giant inside snow line
 				var aGasGiant = new world(stars[0].orbits[n]);
 				aGasGiant.worldType = "gas giant";
-				aGasGiant.size = gasGiantSizeTable(3,4);
+				aGasGiant.size = gasGiantSizeTable(doRoll(3,4));
 				stars[0].worlds.push(aGasGiant);
 				stars[0].planetCount++;
 			} else if ((stars[0].gasGiantArrengement == "eccentric" && stars[0].orbits[n] > stars[0].snowLine) && doRoll(3,0) < 15){
@@ -1111,9 +1247,9 @@ function step23(){
 				var aGasGiant = new world(stars[0].orbits[n]);
 				aGasGiant.worldType = "gas giant";
 				if (n == firstBeyond){
-					aGasGiant.size = gasGiantSizeTable(3,4);
+					aGasGiant.size = gasGiantSizeTable(doRoll(3,4));
 				} else {
-					aGasGiant.size = gasGiantSizeTable(3,0);
+					aGasGiant.size = gasGiantSizeTable(doRoll(3,0));
 				}
 				stars[0].worlds.push(aGasGiant);
 				stars[0].planetCount++;
@@ -1121,7 +1257,7 @@ function step23(){
 				//this is a gas giant inside snow line
 				var aGasGiant = new world(stars[0].orbits[n]);
 				aGasGiant.worldType = "gas giant";
-				aGasGiant.size = gasGiantSizeTable(3,4);
+				aGasGiant.size = gasGiantSizeTable(doRoll(3,4));
 				stars[0].worlds.push(aGasGiant);
 				stars[0].planetCount++;
 			} else if ((stars[0].gasGiantArrangement == "epistellar" && stars[0].orbits[n] > stars[0].snowLine) && doRoll(3,0) < 15){
@@ -1129,9 +1265,9 @@ function step23(){
 				var aGasGiant = new world(stars[0].orbits[n]);
 				aGasGiant.worldType = "gas giant";
 				if (n == firstBeyond){
-					aGasGiant.size = gasGiantSizeTable(3,4);
+					aGasGiant.size = gasGiantSizeTable(doRoll(3,4));
 				} else {
-					aGasGiant.size = gasGiantSizeTable(3,0);
+					aGasGiant.size = gasGiantSizeTable(doRoll(3,0));
 				}
 				stars[0].worlds.push(aGasGiant);
 				stars[0].planetCount++;
@@ -2196,6 +2332,7 @@ for (var n=0;n<stars.length;n++){
 		document.write("Planet: " + stars[n].starName + " " + (planetInd + 1) + "<br/>");
 		document.write("Type: " + stars[n].worlds[planetInd].subType + "<br/>");
 		document.write("Orbital Radius: " + stars[n].worlds[planetInd].orbitalRadius + "(AU) <br/>");
+		document.write("Gravity: " + stars[n].worlds[planetInd].gravity + " g<br/>);
 		document.write("Hydrosphere: " + stars[n].worlds[planetInd].hydro + "% <br/>");
 		document.write("Moons: " + (stars[n].worlds[planetInd].resonantMoons + stars[n].worlds[planetInd].majorMoons + stars[n].worlds[planetInd].capturedMoons) + "<br/>");
 		document.write("Notes: <br/>" + stars[n].worlds[planetInd].features + "<br/>");
@@ -2216,7 +2353,14 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 	document.write("Moons: " + (stars[0].worlds[planetInd].resonantMoons + stars[0].worlds[planetInd].majorMoons + stars[0].worlds[planetInd].capturedMoons) + "<br/>");
 	document.write("<h3>Physics</h3>");
 	document.write("Type: " + stars[0].worlds[planetInd].size + " " + stars[0].worlds[planetInd].subType + "<br/>");
-
+	document.write("Radius: " + (stars[0].worlds[planetInd].diameter) + " x Terra <br/>");
+	document.write("Surface Area: " + Math.pow(stars[0].worlds[planetInd].diameter,2) + " x Terra <br/>");
+	document.write("Land Area: " + (Math.pow(stars[0].worlds[planetInd].diameter,2)) - 0.01*stars[0].worlds[planetInd].hydro(Math.pow(stars[0].worlds[planetInd].diameter,2)) + " x Terra <br/>");
+	document.write("Mass: " + stars[0].worlds[planetInd].mass + " x Terra <br/>")
+	document.write("<h3>Gravimetry</h3>");
+	document.write("Gravity: " + stars[0].worlds[planetInd].gravity + "g<br/>");
+	document.write("<h3>Hydrosphere</h3>");
+	document.write("Water: " + stars[0].worlds[planetInd].hydro + "%<br/>");
 	document.write("<br/>");
 }
 
@@ -2231,6 +2375,14 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 		document.write("Planet: " + stars[0].starName + " " + (planetInd + 1) + "<br/>");
 		document.write("<h3>Physics</h3>");
 		document.write("Type: " + stars[0].worlds[planetInd].moonSystem[moonInd].size + " " + stars[0].worlds[planetInd].moonSystem[moonInd].subType + "<br/>");
+		document.write("Radius: " + stars[0].worlds[planetInd].moonSystem[moonInd].diameter + " x Terra <br/>");
+		document.write("Surface Area: " + Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2) + " x Terra <br/>");
+		document.write("Land Area: " + Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2) - 0.01*stars[0].worlds[planetInd].moonSystem[moonInd].hydro*Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2)+ " x Terra <br/>");
+		document.write("Mass: " + stars[0].worlds[planetInd].moonSystem[moonInd].mass + " x Terra <br/>")
+		document.write("<h3>Gravimetry</h3>");
+		document.write("Gravity: " + stars[0].worlds[planetInd].moonSystem[moonInd].gravity + "g<br/>");
+		document.write("<h3>Hydrosphere</h3>");
+		document.write("Water: " + stars[0].worlds[planetInd].moonSystem[moonInd].hydro + "%<br/>");
 		document.write("<br/>");
 	}
 }
