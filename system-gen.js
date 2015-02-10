@@ -811,14 +811,14 @@ function step27(){
 				if (hydroRoll > 100){
 					hydroRoll = 100;
 				}
-				stars[0].worlds[n].hydro = hydroRoll  - Math.floor((Math.random()*10));
+				stars[0].worlds[n].hydro = hydroRoll - Math.floor(Math.random()*10);
 			}
 		}
 
 		//now loop through this planet's major moons
 		for (moonInd = 0; moonInd < stars[0].worlds[n].moonSystem.length; moonInd++){
 			if (stars[0].worlds[n].moonSystem[moonInd].subType == "ocean" || stars[0].worlds[n].moonSystem[moonInd].subType == "garden"){
-				stars[0].worlds[n].moonSystem[moonInd].hydro = 10 * doRoll(1, 4) - Math.floor((Math.random()*10));
+				stars[0].worlds[n].moonSystem[moonInd].hydro = 10 * doRoll(1, 4) - Math.floor(Math.random()*10);
 			}
 		}
 	}
@@ -2357,7 +2357,7 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 	document.write("Type: " + stars[0].worlds[planetInd].size + " " + stars[0].worlds[planetInd].subType + "<br/>");
 	document.write("Radius: " + (stars[0].worlds[planetInd].diameter) + " x Terra <br/>");
 	document.write("Surface Area: " + Math.pow(stars[0].worlds[planetInd].diameter,2) + " x Terra <br/>");
-	document.write("Land Area: " + (Math.pow(stars[0].worlds[planetInd].diameter,2)) - 0.01*stars[0].worlds[planetInd].hydro*(Math.pow(stars[0].worlds[planetInd].diameter,2)) + " x Terra <br/>");
+	document.write("Land Area: " + ((Math.pow(stars[0].worlds[planetInd].diameter,2)) - 0.01*stars[0].worlds[planetInd].hydro*(Math.pow(stars[0].worlds[planetInd].diameter,2))) + " x Terra <br/>");
 	document.write("Mass: " + stars[0].worlds[planetInd].mass + " x Terra <br/>")
 	document.write("<h3>Gravimetry</h3>");
 	document.write("Gravity: " + stars[0].worlds[planetInd].gravity + "g<br/>");
@@ -2379,7 +2379,7 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 		document.write("Type: " + stars[0].worlds[planetInd].moonSystem[moonInd].size + " " + stars[0].worlds[planetInd].moonSystem[moonInd].subType + "<br/>");
 		document.write("Radius: " + stars[0].worlds[planetInd].moonSystem[moonInd].diameter + " x Terra <br/>");
 		document.write("Surface Area: " + Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2) + " x Terra <br/>");
-		document.write("Land Area: " + Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2) - 0.01*stars[0].worlds[planetInd].moonSystem[moonInd].hydro*Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2)+ " x Terra <br/>");
+		document.write("Land Area: " + (Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2) - 0.01*stars[0].worlds[planetInd].moonSystem[moonInd].hydro*Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2)) + " x Terra <br/>");
 		document.write("Mass: " + stars[0].worlds[planetInd].moonSystem[moonInd].mass + " x Terra <br/>")
 		document.write("<h3>Gravimetry</h3>");
 		document.write("Gravity: " + stars[0].worlds[planetInd].moonSystem[moonInd].gravity + "g<br/>");
