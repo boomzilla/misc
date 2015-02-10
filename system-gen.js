@@ -678,6 +678,7 @@ function worldDensityTable(subType, size){
 		}
 	} else if (subType == "rock" && (size == "tiny" || size == "small")){
 		//small iron core
+		roll = doRoll(3,0);
 		switch(roll){
 			case 3:
 			case 4:
@@ -703,6 +704,7 @@ function worldDensityTable(subType, size){
 		}
 	} else {
 		//large iron core
+		roll = doRoll(3,0);
 		switch(roll){
 			case 3:
 			case 4:
@@ -2332,7 +2334,7 @@ for (var n=0;n<stars.length;n++){
 		document.write("Planet: " + stars[n].starName + " " + (planetInd + 1) + "<br/>");
 		document.write("Type: " + stars[n].worlds[planetInd].subType + "<br/>");
 		document.write("Orbital Radius: " + stars[n].worlds[planetInd].orbitalRadius + "(AU) <br/>");
-		document.write("Gravity: " + stars[n].worlds[planetInd].gravity + " g<br/>);
+		document.write("Gravity: " + stars[n].worlds[planetInd].gravity + " g<br/>");
 		document.write("Hydrosphere: " + stars[n].worlds[planetInd].hydro + "% <br/>");
 		document.write("Moons: " + (stars[n].worlds[planetInd].resonantMoons + stars[n].worlds[planetInd].majorMoons + stars[n].worlds[planetInd].capturedMoons) + "<br/>");
 		document.write("Notes: <br/>" + stars[n].worlds[planetInd].features + "<br/>");
@@ -2355,7 +2357,7 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 	document.write("Type: " + stars[0].worlds[planetInd].size + " " + stars[0].worlds[planetInd].subType + "<br/>");
 	document.write("Radius: " + (stars[0].worlds[planetInd].diameter) + " x Terra <br/>");
 	document.write("Surface Area: " + Math.pow(stars[0].worlds[planetInd].diameter,2) + " x Terra <br/>");
-	document.write("Land Area: " + (Math.pow(stars[0].worlds[planetInd].diameter,2)) - 0.01*stars[0].worlds[planetInd].hydro(Math.pow(stars[0].worlds[planetInd].diameter,2)) + " x Terra <br/>");
+	document.write("Land Area: " + (Math.pow(stars[0].worlds[planetInd].diameter,2)) - 0.01*stars[0].worlds[planetInd].hydro*(Math.pow(stars[0].worlds[planetInd].diameter,2)) + " x Terra <br/>");
 	document.write("Mass: " + stars[0].worlds[planetInd].mass + " x Terra <br/>")
 	document.write("<h3>Gravimetry</h3>");
 	document.write("Gravity: " + stars[0].worlds[planetInd].gravity + "g<br/>");
