@@ -2442,6 +2442,10 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 	document.write("<h3>Atmosphere</h3>");
 	document.write("Type: " + stars[0].worlds[planetInd].abstractPres + " " + stars[0].worlds[planetInd].atmoQual +"<br/>");
 	document.write("Pressure: " + stars[0].worlds[planetInd].pressure + " x Terra<br/>");
+	document.write("<h3>Climate</h3>");
+	document.write("Type: " + stars[0].worlds[planetInd].climateType + "<br/>");
+	document.write("Avg Temp: " + stars[0].worlds[planetInd].averageSurfaceTemp + "K (" + (stars[0].worlds[planetInd].averageSurfaceTemp-273.15) + "C)<br/>");
+	document.write("Special Features: <br/>" + stars[0].worlds[planetInd].features + "<br/>");
 	document.write("<br/>");
 }
 
@@ -2467,6 +2471,10 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 		document.write("<h3>Atmosphere</h3>");
 		document.write("Type: " + stars[0].worlds[planetInd].moonSystem[moonInd].abstractPres + " " + stars[0].worlds[planetInd].moonSystem[moonInd].atmoQual +"<br/>");
 		document.write("Pressure: " + stars[0].worlds[planetInd].moonSystem[moonInd].pressure + " x Terra<br/>");
+		document.write("<h3>Climate</h3>");
+		document.write("Type: " + stars[0].worlds[planetInd].moonSystem[moonInd].climateType + "<br/>");
+		document.write("Avg Temp: " + stars[0].worlds[planetInd].moonSystem[moonInd].averageSurfaceTemp + "K (" + (stars[0].worlds[planetInd].moonSystem[moonInd].averageSurfaceTemp-273.15) + "C) <br/>");
+		document.write("Special Features: <br/>" + stars[0].worlds[planetInd].moonSystem[moonInd].features + "<br/>");
 		document.write("<br/>");
 	}
 }
