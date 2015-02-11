@@ -879,7 +879,7 @@ function step27(){
 		if (stars[0].worlds[n].subType == "ocean" || stars[0].worlds[n].subType == "garden"){
 			stars[0].worlds[n].hydroType = "water";
 			if (stars[0].worlds[n].size == "standard"){
-				stars[0].worlds[n].hydro = 10 * doRoll(1, 4);
+				stars[0].worlds[n].hydro = 10 * doRoll(1, 4) - Math.floor(Math.random()*10);
 			} else {
 				//large world
 				hydroRoll = 10 * doRoll(1,6);
