@@ -113,6 +113,9 @@ function moon(){
 	this.diameter = -1.00;	//Earth diameters
 	this.gravity = -1.00;	//surface gravity in Gs
 	this.mass = -1.00;	//mass in Earths
+	this.pressure = -1.00;	//pressure in atmos
+	this.abstractPres = "ERROR";
+	this.atmoQual = "ERROR";
 }
 
 function world(orbitalRadius){
@@ -146,6 +149,9 @@ function world(orbitalRadius){
 	this.diameter = -1.00;	//Earth diameters
 	this.gravity = -1.00;	//surface gravity in Gs
 	this.mass = -1.00;	//mass in Earths
+	this.pressure = -1.00;	//pressure in atmos
+	this.abstractPres = "ERROR";
+	this.atmoQual = "ERROR";
 }
 
 function starObj(){
@@ -755,6 +761,57 @@ function getDiameter(temp, density, size){
 	return min + ((max-min) * 0.1 * doRoll(2,-2));
 }
 
+function getPressureFactor(size, subType){
+	if (size == "small"){
+		return 10;
+	} else if (size == "standard" && subType == "greenhouse"){
+		return 100;
+	} else if (size == "standard"){
+		return 1;
+	} else if (size == "large" && subType == "greenhouse"){
+		return 500;
+	} else {
+		return 5;
+	}
+}
+
+function getAbstractPres(pressure){
+	if (pressure < 0.01){
+		return "trace";
+	} else if (pressure <= 0.5){
+		return "very thin";
+	} else if (pressure <= 0.8){
+		return "thin";
+	} else if (pressure <= 1.2){
+		return "standard";
+	} else if (pressure <= 1.5){
+		return "dense";
+	} else if (pressure <= 10){
+		return "very dense";
+	} else {
+		return "superdense";
+	}
+}
+
+function getAtmoQual(world){
+	if (((world.suffocatingAtmo || world.corrosiveAtmo) || (world.mToxicAtmo || world.hToxicAtmo)) || world.lToxicAtmo){
+		return "unbreathable";
+	}
+
+	if (world.marginalAtmo.length > 0){
+		toReturn = "marginal (";
+			for (var n = 0; n < world.marginalAtmo.length; n++){
+				if (n > 0){
+					toReturn += ",";
+				}
+				toReturn += world.marginalAtmo[n];
+			}
+		return toReturn + ")";
+	}
+
+	return "breathable";
+}
+
 function step29(){
 	//world size
 	//refer also to step 6 in book
@@ -765,6 +822,15 @@ function step29(){
 			thisWorld.diameter = getDiameter(thisWorld.blackbodyTemp, thisWorld.density, thisWorld.size);
 			thisWorld.gravity = thisWorld.density * thisWorld.diameter;
 			thisWorld.mass = thisWorld.density * Math.pow(thisWorld.diameter,3);
+			if (!thisWorld.vac){
+				thisWorld.pressure = thisWorld.atmoMass * thisWorld.gravity * getPressureFactor(thisWorld.size, thisWorld.subType);
+				thisWorld.abstractPres = getAbstractPres(thisWorld.pressure);
+				thisWorld.atmoQual = getAtmoQual(thisWorld);
+			} else {
+				thisWorld.pressure = 0;
+				thisWorld.abstractPres = "vacuum";
+				thisWorld.atmoQual = "";
+			}
 		}
 
 		//now loop through this planet's major moons
@@ -774,6 +840,15 @@ function step29(){
 			thisMoon.diameter = getDiameter(thisMoon.blackbodyTemp, thisMoon.density, thisMoon.size);
 			thisMoon.gravity = thisMoon.density * thisMoon.diameter;
 			thisMoon.mass = thisMoon.density * Math.pow(thisMoon.diameter,3);
+			if (!thisMoon.vac){
+				thisMoon.pressure = thisMoon.atmoMass * thisMoon.gravity * getPressureFactor(thisMoon.size, thisMoon.subType);
+				thisMoon.abstractPres = getAbstractPres(thisMoon.pressure);
+				thisMoon.atmoQual = getAtmoQual(thisMoon);
+			} else {
+				thisMoon.pressure = 0;
+				thisMoon.abstractPres = "vacuum";
+				thisMoon.atmoQual = "";
+			}
 		}
 	}
 }
@@ -2336,6 +2411,7 @@ for (var n=0;n<stars.length;n++){
 		document.write("Orbital Radius: " + stars[n].worlds[planetInd].orbitalRadius + "(AU) <br/>");
 		document.write("Gravity: " + stars[n].worlds[planetInd].gravity + " g<br/>");
 		document.write("Hydrosphere: " + stars[n].worlds[planetInd].hydro + "% <br/>");
+		document.write("Atmosphere: " + stars[n].worlds[planetInd].abstractPres + " " + stars[n].worlds[planetInd].atmoQual + "<br/>");
 		document.write("Moons: " + (stars[n].worlds[planetInd].resonantMoons + stars[n].worlds[planetInd].majorMoons + stars[n].worlds[planetInd].capturedMoons) + "<br/>");
 		document.write("Notes: <br/>" + stars[n].worlds[planetInd].features + "<br/>");
 		document.write("<br/>");
@@ -2363,6 +2439,9 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 	document.write("Gravity: " + stars[0].worlds[planetInd].gravity + "g<br/>");
 	document.write("<h3>Hydrosphere</h3>");
 	document.write("Water: " + stars[0].worlds[planetInd].hydro + "%<br/>");
+	document.write("<h3>Atmosphere</h3>");
+	document.write("Type: " + stars[0].worlds[planetInd].abstractPres + " " + stars[0].worlds[planetInd].atmoQual +"<br/>");
+	document.write("Pressure: " + stars[0].worlds[planetInd].pressure + " x Terra<br/>");
 	document.write("<br/>");
 }
 
@@ -2385,6 +2464,9 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 		document.write("Gravity: " + stars[0].worlds[planetInd].moonSystem[moonInd].gravity + "g<br/>");
 		document.write("<h3>Hydrosphere</h3>");
 		document.write("Water: " + stars[0].worlds[planetInd].moonSystem[moonInd].hydro + "%<br/>");
+		document.write("<h3>Atmosphere</h3>");
+		document.write("Type: " + stars[0].worlds[planetInd].moonSystem[moonInd].abstractPres + " " + stars[0].worlds[planetInd].moonSystem[moonInd].atmoQual +"<br/>");
+		document.write("Pressure: " + stars[0].worlds[planetInd].moonSystem[moonInd].pressure + " x Terra<br/>");
 		document.write("<br/>");
 	}
 }
