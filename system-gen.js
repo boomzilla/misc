@@ -798,6 +798,10 @@ function getAtmoQual(world){
 		return "unbreathable";
 	}
 
+	if (world.abstractPres == "trace"){
+		return "unbreathable";
+	}
+
 	if (world.marginalAtmo.length > 0){
 		toReturn = "marginal (";
 			for (var n = 0; n < world.marginalAtmo.length; n++){
@@ -823,7 +827,11 @@ function step29(){
 			thisWorld.gravity = thisWorld.density * thisWorld.diameter;
 			thisWorld.mass = thisWorld.density * Math.pow(thisWorld.diameter,3);
 			if (!thisWorld.vac){
-				thisWorld.pressure = thisWorld.atmoMass * thisWorld.gravity * getPressureFactor(thisWorld.size, thisWorld.subType);
+				if (thisWorld.subType == "chthonian" || (thisWorld.size == "small" && thisWorld.subType == "rock")){
+					thisWorld.pressure = 0.005;	//just aribitrarily pick 0.5% of Earth (Mars is about that)
+				} else {
+					thisWorld.pressure = thisWorld.atmoMass * thisWorld.gravity * getPressureFactor(thisWorld.size, thisWorld.subType);
+				}
 				thisWorld.abstractPres = getAbstractPres(thisWorld.pressure);
 				thisWorld.atmoQual = getAtmoQual(thisWorld);
 			} else {
@@ -831,6 +839,7 @@ function step29(){
 				thisWorld.abstractPres = "vacuum";
 				thisWorld.atmoQual = "";
 			}
+		} else if (thisWorld.worldType == "gas giant"){
 		}
 
 		//now loop through this planet's major moons
@@ -841,7 +850,11 @@ function step29(){
 			thisMoon.gravity = thisMoon.density * thisMoon.diameter;
 			thisMoon.mass = thisMoon.density * Math.pow(thisMoon.diameter,3);
 			if (!thisMoon.vac){
-				thisMoon.pressure = thisMoon.atmoMass * thisMoon.gravity * getPressureFactor(thisMoon.size, thisMoon.subType);
+				if (thisMoon.subType == "chthonian" || (thisMoon.size == "small" && thisMoon.subType == "rock")){
+					thisMoon.pressure = 0.005; //just aribitrarily pick 0.5% of Earth (Mars is about that)
+				} else {
+					thisMoon.pressure = thisMoon.atmoMass * thisMoon.gravity * getPressureFactor(thisMoon.size, thisMoon.subType);
+				}
 				thisMoon.abstractPres = getAbstractPres(thisMoon.pressure);
 				thisMoon.atmoQual = getAtmoQual(thisMoon);
 			} else {
@@ -949,7 +962,7 @@ function step26(){
 					stars[0].worlds[n].suffocatingAtmo = true;
 					stars[0].worlds[n].hToxicAtmo = true;
 				}
-			} else {
+			} else if (!((stars[0].worlds[n].size == "small" && stars[0].worlds[n].subType == "rock") || stars[0].worlds[n].subType == "chthonian")){
 				stars[0].worlds[n].vac = true;
 			}
 		}
