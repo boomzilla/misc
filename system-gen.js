@@ -816,6 +816,170 @@ function getAtmoQual(world){
 	return "breathable";
 }
 
+function getGasMass(roll, size){
+	if (size == "small"){
+		switch(roll){
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+				return 10;
+			case 9:
+			case 10:
+				return 15;
+			case 11:
+				return 20;
+			case 12:
+				return 30;
+			case 13:
+				return 40;
+			case 14:
+				return 50;
+			case 15:
+				return 60;
+			case 16:
+				return 70;
+			default:
+				return 80;
+		}
+	} else if(size == "medium"){
+		switch(roll){
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+				return 100;
+			case 9:
+			case 10:
+				return 150;
+			case 11:
+				return 200;
+			case 12:
+				return 250;
+			case 13:
+				return 300;
+			case 14:
+				return 350;
+			case 15:
+				return 400;
+			case 16:
+				return 450;
+			default:
+				return 500;
+		}
+	} else {
+		//size == "large"
+		switch(roll){
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+				return 600;
+			case 9:
+			case 10:
+				return 800;
+			case 11:
+				return 1000;
+			case 12:
+				return 1500;
+			case 13:
+				return 2000;
+			case 14:
+				return 2500;
+			case 15:
+				return 3000;
+			case 16:
+				return 3500;
+			default:
+				return 4000;
+		}
+	}
+}
+
+function getGasDensity(roll, size){
+	if (size == "small"){
+		switch(roll){
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+				return 0.42;
+			case 9:
+			case 10:
+				return 0.26;
+			case 11:
+				return 0.22;
+			case 12:
+				return 0.19;
+			default:
+				return 0.17;
+		}
+	} else if(size == "medium"){
+		switch(roll){
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+				return 0.18;
+			case 9:
+			case 10:
+				return 0.19;
+			case 11:
+				return 0.20;
+			case 12:
+				return 0.22;
+			case 13:
+				return 0.24;
+			case 14:
+				return 0.25;
+			case 15:
+				return 0.26;
+			case 16:
+				return 0.27;
+			default:
+				return 0.29;
+		}
+	} else {
+		//size == "large"
+		switch(roll){
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+				return 0.31;
+			case 9:
+			case 10:
+				return 0.35;
+			case 11:
+				return 0.4;
+			case 12:
+				return 0.6;
+			case 13:
+				return 0.8;
+			case 14:
+				return 1.0;
+			case 15:
+				return 1.2;
+			case 16:
+				return 1.4;
+			default:
+				return 1.6;
+		}
+	}
+}
+
 function step29(){
 	//world size
 	//refer also to step 6 in book
@@ -840,6 +1004,13 @@ function step29(){
 				thisWorld.atmoQual = "";
 			}
 		} else if (thisWorld.worldType == "gas giant"){
+			gasMass = doRoll(3,0);
+			thisWorld.mass = getGasMass(gasMass, thisWorld.size);
+			thisWorld.density = getGasDensity(gasMass, thisWorld.size);
+			thisWorld.diameter = Math.pow((thisWorld.mass / thisWorld.density),(1.0/3.0));
+			thisWorld.gravity = thisWorld.density * thisWorld.diameter;
+		} else {
+			//asteroid belt
 		}
 
 		//now loop through this planet's major moons
