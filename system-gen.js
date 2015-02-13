@@ -116,6 +116,7 @@ function moon(){
 	this.pressure = -1.00;	//pressure in atmos
 	this.abstractPres = "ERROR";
 	this.atmoQual = "ERROR";
+	this.orbitalPeriod = -1.00;	//orbital period in Earth years
 }
 
 function world(orbitalRadius){
@@ -152,6 +153,7 @@ function world(orbitalRadius){
 	this.pressure = -1.00;	//pressure in atmos
 	this.abstractPres = "ERROR";
 	this.atmoQual = "ERROR";
+	this.orbitalPeriod = -1.00;	//orbital period in Earth years
 }
 
 function starObj(){
@@ -980,6 +982,28 @@ function getGasDensity(roll, size){
 	}
 }
 
+function step31(){
+}
+
+function step30(){
+	//dynamic properties
+	for (n = 0; n < stars[0].worlds.length; n++){
+		thisWorld = stars[0].worlds[n];
+		thisWorld.orbitalPeriod = Math.sqrt(Math.pow(thisWorld.orbitalRadius,3) / (stars[0].mass + thisWorld.mass*0.000003));
+
+		if (thisWorld.hasSulfurMoon){
+			while(thisWorld.moonSystem[0].subType != "sulfur"){
+				thisWorld.moonSystem.unshift(thisWorld.moonSystem.pop());
+			}
+		}
+
+		for (moonInd = 0; moonInd < thisWorld.moonSystem.length; moonInd++){
+			thisMoon = thisWorld.moonSystem[moonInd];
+		}
+	}
+	step31()
+}
+
 function step29(){
 	//world size
 	//refer also to step 6 in book
@@ -1035,6 +1059,7 @@ function step29(){
 			}
 		}
 	}
+	step30();
 }
 
 function step28(){
@@ -2463,7 +2488,7 @@ function step16(){
 			caseNumb = 33;
 	}
 
-	if (stars.length > 1)
+	/**if (stars.length > 1)
 	{
 		//find mass of any companion stars
 		isSameMassAs = doOneDieWithMinus(1);
@@ -2503,8 +2528,9 @@ function step16(){
 				stars[2].lmin = lmtab[SecondCaseNumb];
 			}
 		}
-	}
+	}**/
 	stars[0].mass = stellarMassTable[caseNumb];
+	//stars[0].	
 	stars[0].lmin = lmtab[caseNumb];
 
 	step17()
