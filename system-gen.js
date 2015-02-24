@@ -1011,6 +1011,7 @@ function step29(){
 		thisWorld = stars[0].worlds[n];
 		if (thisWorld.worldType == "terrestrial"){
 			thisWorld.density = worldDensityTable(thisWorld.subType, thisWorld.size);
+			thisWorld.density += Math.random()*0.1 - 0.05;
 			thisWorld.diameter = getDiameter(thisWorld.blackbodyTemp, thisWorld.density, thisWorld.size);
 			thisWorld.gravity = thisWorld.density * thisWorld.diameter;
 			thisWorld.mass = thisWorld.density * Math.pow(thisWorld.diameter,3);
@@ -1030,7 +1031,9 @@ function step29(){
 		} else if (thisWorld.worldType == "gas giant"){
 			gasMass = doRoll(3,0);
 			thisWorld.mass = getGasMass(gasMass, thisWorld.size);
+			thisWorld.mass += thisWorld.mass * Math.random()*0.1;
 			thisWorld.density = getGasDensity(gasMass, thisWorld.size);
+			thisWorld.density += thisWorld.densirty * Math.random()*0.2 - 0.1;
 			thisWorld.diameter = Math.pow((thisWorld.mass / thisWorld.density),(1.0/3.0));
 			thisWorld.gravity = thisWorld.density * thisWorld.diameter;
 		} else {
@@ -1041,6 +1044,7 @@ function step29(){
 		for (moonInd = 0; moonInd < thisWorld.moonSystem.length; moonInd++){
 			thisMoon = thisWorld.moonSystem[moonInd];
 			thisMoon.density = worldDensityTable(thisMoon.subType, thisMoon.size);
+			thisMoon.density += Math.random()*0.1 - 0.05;
 			thisMoon.diameter = getDiameter(thisMoon.blackbodyTemp, thisMoon.density, thisMoon.size);
 			thisMoon.gravity = thisMoon.density * thisMoon.diameter;
 			thisMoon.mass = thisMoon.density * Math.pow(thisMoon.diameter,3);
@@ -1116,6 +1120,10 @@ function step26(){
 		if (stars[0].worlds[n].worldType == "terrestrial"){
 			if (!noAtmo(stars[0].worlds[n])){
 				stars[0].worlds[n].atmoMass = doRoll(3,0)/10.0;
+				document.write("wat: " + stars[0].worlds[n].atmoMass + "<br/>");
+				stars[0].worlds[n].atmoMass += (Math.random()*0.1 - 0.05);
+				document.write("random statement makes " + (Math.random()*0.1 - 0.05));
+				document.write("post: " + stars[0].worlds[n].atmoMass + "<br/>");
 				if (stars[0].worlds[n].size == "small" && stars[0].worlds[n].subType == "ice"){
 					if (doRoll(3,0)<16){
 						stars[0].worlds[n].suffocatingAtmo = true;
@@ -1167,6 +1175,7 @@ function step26(){
 		for (moonInd = 0; moonInd < stars[0].worlds[n].moonSystem.length; moonInd++){
 			if (!noAtmo(stars[0].worlds[n].moonSystem[moonInd])){
 				stars[0].worlds[n].moonSystem[moonInd].atmoMass = doRoll(3,0)/10.0;
+				stars[0].worlds[n].moonSystem[moonInd].atmoMass += (Math.random()*0.1 - 0.05);
 				if (stars[0].worlds[n].moonSystem[moonInd].size == "small" && stars[0].worlds[n].moonSystem[moonInd].subType == "ice"){
 					if (doRoll(3,0)<16){
 						stars[0].worlds[n].moonSystem[moonInd].suffocatingAtmo = true;
@@ -2337,7 +2346,7 @@ function step18(){
 			stars[n].temp = 3100;
 			stars[n].lumin = 0.0012; 
 		}
-
+		stars[n].lumin += stars[n].lumin*(Math.random()*0.2 - 0.1);
 		stars[n].radius = (155000 * Math.sqrt(stars[n].lumin)) / (stars[n].temp * stars[n].temp);
 		//type (e.g. main sequence, etc) has now been determined, now find derived vars for this star
 		//actually, no
@@ -2530,7 +2539,7 @@ function step16(){
 		}
 	}**/
 	stars[0].mass = stellarMassTable[caseNumb];
-	//stars[0].	
+	stars[0].mass += (Math.random()*0.4 - 0.2);	
 	stars[0].lmin = lmtab[caseNumb];
 
 	step17()
