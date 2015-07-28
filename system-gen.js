@@ -1034,7 +1034,7 @@ function step29(){
 			thisWorld.mass = getGasMass(gasMass, thisWorld.size);
 			thisWorld.mass += thisWorld.mass * Math.random()*0.1;
 			thisWorld.density = getGasDensity(gasMass, thisWorld.size);
-			thisWorld.density += thisWorld.densirty * Math.random()*0.2 - 0.1;
+			thisWorld.density += thisWorld.density * Math.random()*0.2 - 0.1;
 			thisWorld.diameter = Math.pow((thisWorld.mass / thisWorld.density),(1.0/3.0));
 			thisWorld.gravity = thisWorld.density * thisWorld.diameter;
 		} else {
