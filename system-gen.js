@@ -1,4 +1,5 @@
-var forceGarden = true;
+//var forceGarden = true;
+var forceGarden = false;
 
 do{
 	forceGarden = makeSolarSystem();
@@ -2639,6 +2640,7 @@ for (var n=0;n<stars.length;n++){
 }
 
 //describe planets in plaintext
+//
 document.write("<h2><a name=\"planetsText\">planets (plaintext):</a></h2>");
 document.write("<br/>");
 for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
@@ -2654,6 +2656,7 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 	document.write("Surface Area: " + Math.pow(stars[0].worlds[planetInd].diameter,2) + " x Terra <br/>");
 	document.write("Land Area: " + ((Math.pow(stars[0].worlds[planetInd].diameter,2)) - 0.01*stars[0].worlds[planetInd].hydro*(Math.pow(stars[0].worlds[planetInd].diameter,2))) + " x Terra <br/>");
 	document.write("Mass: " + stars[0].worlds[planetInd].mass + " x Terra <br/>")
+	document.write("Density: " + stars[0].worlds[planetInd].density + " x Terra <br/>")
 	document.write("<h3>Gravimetry</h3>");
 	document.write("Gravity: " + stars[0].worlds[planetInd].gravity + "g<br/>");
 	document.write("<h3>Hydrosphere</h3>");
@@ -2683,6 +2686,7 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 		document.write("Surface Area: " + Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2) + " x Terra <br/>");
 		document.write("Land Area: " + (Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2) - 0.01*stars[0].worlds[planetInd].moonSystem[moonInd].hydro*Math.pow((stars[0].worlds[planetInd].moonSystem[moonInd].diameter),2)) + " x Terra <br/>");
 		document.write("Mass: " + stars[0].worlds[planetInd].moonSystem[moonInd].mass + " x Terra <br/>")
+		document.write("Density: " + stars[0].worlds[planetInd].moonSystem[moonInd].density + " x Terra <br/>")
 		document.write("<h3>Gravimetry</h3>");
 		document.write("Gravity: " + stars[0].worlds[planetInd].moonSystem[moonInd].gravity + "g<br/>");
 		document.write("<h3>Hydrosphere</h3>");
@@ -2699,6 +2703,10 @@ for (var planetInd = 0; planetInd<stars[0].worlds.length; planetInd++){
 }
 
 //output markup
+//
+//defer for now
+//
+/**
 document.write("</code>");
 
 document.write("<h2><a name=\"systemOverview\">System Overview (markup):</a></h2>");
@@ -2724,6 +2732,7 @@ for (var n=0;n<stars.length;n++){
 	document.write("<br/>");
 }
 document.write("</code>");
+**/
 
 return false;
 }
