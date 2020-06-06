@@ -5,7 +5,6 @@
 * Learn about GitHub and Markdown
 * Create your own Markdown profile page
 * Understand the GitHub workflow (including forks, repositories, commits, and pull requests)
-* [anchor link to test](#Testing_testing_123)
 
 ## Preparation
 
@@ -149,8 +148,6 @@ After the pull request is merged, you'll be able to see your personal page at `t
 [GitHub - How to fork a repo](https://help.github.com/articles/fork-a-repo/) - A more in-depth explanation about how and why we fork repositories.
 
 [Other helpful links and videos](faq.md#Helpful_Links)
-
-### <a name="Testing_testing_123"></a>Testing testing 123
 
 ---
 #### Return to [First Steps](firststeps.md#Step_3_-_Markdown_and_Fork_Tutorial)
